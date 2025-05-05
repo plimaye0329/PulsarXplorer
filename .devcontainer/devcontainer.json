@@ -1,0 +1,17 @@
+{
+    "name": "Python 3.12 Dash App",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+    },
+    "forwardPorts": [8050],
+    "postCreateCommand": "pip install -r requirements.txt",
+    "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+    ]
+}
+
