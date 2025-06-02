@@ -1,12 +1,29 @@
-from dash import Dash
+from dash import Dash, Output, Input  # Add Output, Input import
 from layout import create_layout
 from utils.data import load_data
 from callbacks import register_all_callbacks
+import dash_bootstrap_components as dbc
+
 
 df = load_data()
 
-app = Dash(__name__)
-app.layout = create_layout(df)
+app = Dash(external_stylesheets=[dbc.themes.SANDSTONE], suppress_callback_exceptions=True)    
+app.layout = create_layout()
+app.clientside_callback(
+    """
+    function(n_clicks) {
+        // When close-popup is clicked, clear clickData
+        if (n_clicks) {
+            return null;
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output('scatter-plot', 'clickData'),
+    Input('close-popup', 'n_clicks'),
+    prevent_initial_call=True
+)
+
 
 register_all_callbacks(app, df)
 
