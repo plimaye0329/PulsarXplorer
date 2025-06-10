@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 
 df = load_data()
 
-app = Dash(external_stylesheets=[dbc.themes.SANDSTONE], suppress_callback_exceptions=True)    
+app = Dash(external_stylesheets=[dbc.themes.FLATLY], suppress_callback_exceptions=True)    
 app.layout = create_layout()
 app.clientside_callback(
     """
