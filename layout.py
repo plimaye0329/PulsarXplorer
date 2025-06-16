@@ -7,31 +7,58 @@ from dash import dash_table
 DATA_FOLDER = './utils/'
 
 def get_csv_files():
-    return [f for f in os.listdir(DATA_FOLDER) if f.endswith('.csv') or f.endswith('.txt')]
+    return [f for f in os.listdir(DATA_FOLDER) if f.endswith('.csv') or f.endswith('.cands')]
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 server = app.server
 
 def create_layout():
+    interval_options = [
+        {'label': '5 seconds', 'value': 5000},
+        {'label': '30 seconds', 'value': 30000},
+        {'label': '500 seconds', 'value': 500000},
+    ]
+
+    interval_selector = dcc.RadioItems(
+        id='interval-selector',
+        options=interval_options,
+        value=5000,  # default to 5 seconds
+        labelStyle={'display': 'inline-block', 'marginRight': '15px'},
+        style={"color": "black", "marginBottom": "15px"}
+    )
+    
     return dbc.Container([
-        dcc.Store(id='data-store'),
         dcc.Store(id='clicked-point'),
         dcc.Store(id='click-counter', data=0),
         dcc.Store(id='clear-clickdata', data=False),
         html.Button(id='close-popup', style={'display': 'none'}),
+        dcc.Interval(id='interval-component', interval=5000, n_intervals=0),
+        dcc.Store(id='cached-csv-data'),
+        dcc.Store(id='last-modified-timestamp', data=""),
 
         dbc.Row([
-            # Sidebar
+            # Sidebar controls
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H4("Selection Panel", className="mb-0",style={"color": "black"})),
+                    dbc.CardHeader(html.H4("Selection Panel", className="mb-0", style={"color": "black"})),
                     dbc.CardBody([
-                        html.H2("TransientXplorer", className="display-5 mb-3",style={"color": "black"}),
+                        html.H2("TransientXplorer", className="display-5 mb-3", style={"color": "black"}),
                         html.P(
                             "Interactive tool for exploring transient burst data.",
                             className="text-muted fst-italic"
                         ),
-                        dbc.Label("Select CSV file", className="mt-3 fw-semibold"),
+
+                        dbc.Checklist(
+                            id='auto-refresh-toggle',
+                            options=[{'label': 'Auto Refresh', 'value': 'enabled'}],
+                            value=['enabled'],
+                            inline=True,
+                            style={"color": "black", "marginBottom": "15px"}
+                        ),
+
+                        interval_selector,
+
+                        dbc.Label("Select CSV file", className="mt-3 fw-semibold", style={"color": "black"}),
                         dcc.Dropdown(
                             id='csv-selector',
                             options=[{'label': f, 'value': f} for f in get_csv_files()],
@@ -40,8 +67,9 @@ def create_layout():
                             className="mb-3"
                         ),
                         html.Hr(),
+
                         html.Label("X-axis:", style={"color": "black"}),
-                        dcc.Dropdown(id='x-axis', style={"color": "black"}),
+                        dcc.Dropdown(id='x-axis', options=[], value=None, style={"color": "black"},persistence=True),
 
                         html.Label("X-axis Scale:", style={"color": "black"}),
                         dcc.RadioItems(
@@ -53,7 +81,7 @@ def create_layout():
                         ),
 
                         html.Label("Y-axis:", style={"color": "black"}),
-                        dcc.Dropdown(id='y-axis', style={"color": "black"}),
+                        dcc.Dropdown(id='y-axis', options=[], value=None, style={"color": "black"},persistence=True),
 
                         html.Label("Y-axis Scale:", style={"color": "black"}),
                         dcc.RadioItems(
@@ -64,10 +92,15 @@ def create_layout():
                             style={"color": "black"}
                         ),
                     ])
-                ], color="light", className="shadow-sm", style={"borderRadius": "12px", "background": "black", "color": "black", "padding": "15px"}),
+                ], color="light", className="shadow-sm", style={
+                    "borderRadius": "12px",
+                    "background": "black",
+                    "color": "black",
+                    "padding": "15px"
+                }),
             ], width=3),
 
-            # Main content
+            # Main content (Graph + Table tabs)
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader(html.H4("Monitoring Interface", className="mb-0")),
@@ -86,12 +119,11 @@ def create_layout():
                                     sort_action='native',
                                     row_selectable='single',
                                     selected_rows=[],
+                                    style_table={'overflowX': 'auto'},
                                 )
                             ])
                         ]),
                         html.Div(id='image-popup', style={'display': 'none'}),
-
-                        # Add this div as a placeholder for dynamic content from your callbacks
                         html.Div(id='dynamic-content', style={"marginTop": "20px"})
                     ])
                 ], className="shadow-sm", style={"borderRadius": "12px"})
@@ -100,3 +132,5 @@ def create_layout():
     ], fluid=True)
 
 app.layout = create_layout()
+
+
