@@ -7,10 +7,8 @@ from dash import dash_table
 DATA_FOLDER = './utils/'
 
 def get_csv_files():
+    # Read folder fresh every time this is called
     return [f for f in os.listdir(DATA_FOLDER) if f.endswith('.csv') or f.endswith('.cands')]
-
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
-server = app.server
 
 def create_layout():
     interval_options = [
@@ -35,6 +33,9 @@ def create_layout():
         dcc.Interval(id='interval-component', interval=5000, n_intervals=0),
         dcc.Store(id='cached-csv-data'),
         dcc.Store(id='last-modified-timestamp', data=""),
+
+        # NEW interval to refresh CSV file list every 10 seconds
+        dcc.Interval(id='refresh-files-interval', interval=10*1000, n_intervals=0),
 
         dbc.Row([
             # Sidebar controls
@@ -61,7 +62,7 @@ def create_layout():
                         dbc.Label("Select CSV file", className="mt-3 fw-semibold", style={"color": "black"}),
                         dcc.Dropdown(
                             id='csv-selector',
-                            options=[{'label': f, 'value': f} for f in get_csv_files()],
+                            options=[],  # start empty, populated dynamically by callback
                             placeholder='Choose a CSV file',
                             style={"color": "black"},
                             className="mb-3"
@@ -69,7 +70,7 @@ def create_layout():
                         html.Hr(),
 
                         html.Label("X-axis:", style={"color": "black"}),
-                        dcc.Dropdown(id='x-axis', options=[], value=None, style={"color": "black"},persistence=True),
+                        dcc.Dropdown(id='x-axis', options=[], value=None, style={"color": "black"}, persistence=True),
 
                         html.Label("X-axis Scale:", style={"color": "black"}),
                         dcc.RadioItems(
@@ -81,7 +82,7 @@ def create_layout():
                         ),
 
                         html.Label("Y-axis:", style={"color": "black"}),
-                        dcc.Dropdown(id='y-axis', options=[], value=None, style={"color": "black"},persistence=True),
+                        dcc.Dropdown(id='y-axis', options=[], value=None, style={"color": "black"}, persistence=True),
 
                         html.Label("Y-axis Scale:", style={"color": "black"}),
                         dcc.RadioItems(
@@ -100,29 +101,23 @@ def create_layout():
                 }),
             ], width=3),
 
-            # Main content (Graph + Table tabs)
+            # Main content (Graph + Table together)
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader(html.H4("Monitoring Interface", className="mb-0")),
                     dbc.CardBody([
-                        dcc.Tabs(id='main-tabs', value='tab-graph', children=[
-                            dcc.Tab(label='Graph', value='tab-graph', children=[
-                                dcc.Graph(id="scatter-plot")
-                            ]),
-                            dcc.Tab(label='Table', value='tab-table', children=[
-                                dash_table.DataTable(
-                                    id='main-table',
-                                    columns=[],  # will be populated dynamically
-                                    data=[],
-                                    page_size=6,
-                                    filter_action='native',
-                                    sort_action='native',
-                                    row_selectable='single',
-                                    selected_rows=[],
-                                    style_table={'overflowX': 'auto'},
-                                )
-                            ])
-                        ]),
+                        dcc.Graph(id="scatter-plot", style={"marginBottom": "30px"}),
+                        dash_table.DataTable(
+                            id='main-table',
+                            columns=[],  # will be populated dynamically in your callbacks
+                            data=[],
+                            page_size=6,
+                            filter_action='native',
+                            sort_action='native',
+                            row_selectable='single',
+                            selected_rows=[],
+                            style_table={'overflowX': 'auto'},
+                        ),
                         html.Div(id='image-popup', style={'display': 'none'}),
                         html.Div(id='dynamic-content', style={"marginTop": "20px"})
                     ])
@@ -130,7 +125,3 @@ def create_layout():
             ], width=9),
         ], className="mt-4 gx-4 bg-dark")
     ], fluid=True)
-
-app.layout = create_layout()
-
-

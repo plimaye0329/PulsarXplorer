@@ -1,32 +1,42 @@
 import os
 import pandas as pd
-from dash import html, Input, Output, State, callback_context, no_update, dash_table
+from dash import html, Input, Output, State, callback_context, no_update
 import plotly.express as px
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from utils.image import encode_image
 
-#image_directory = 'assets/Images'
+# Directory where CSVs and images are stored
 image_directory = './utils/'
-file_mod_times = {}  # cache for file modification times
+
+# Cache for file modification times to optimize refresh
+file_mod_times = {}
 
 def check_file_mod_time(filename: str) -> float:
     """Return the last modification time for a given file."""
-    csv_path = os.path.join('./utils', filename)
+    csv_path = os.path.join(image_directory, filename)
     return os.path.getmtime(csv_path)
 
 def load_csv_to_df(filename: str) -> pd.DataFrame:
-    """Load CSV with preprocessing, raise on error."""
-    csv_path = os.path.join('./utils', filename)
+    """Load CSV file into a DataFrame with proper preprocessing."""
+    csv_path = os.path.join(image_directory, filename)
     df_new = pd.read_csv(csv_path, delim_whitespace=True, header=None)
     df_new.columns = ['col1', 'col2', 'MJD', 'Burst_DM', 'col5', 'S/N',
                       'col7', 'col8', 'ImagePath', 'col10', 'col11']
-    df_new['ImageFilename'] = df_new['ImagePath'].apply(
-        lambda x: os.path.basename(x).replace('.png', '.png'))
-    
+    # Extract just the image filename from the full path
+    df_new['ImageFilename'] = df_new['ImagePath'].apply(lambda x: os.path.basename(x))
     return df_new
 
-def register_callbacks(app,df):
+def register_callbacks(app):
+    @app.callback(
+        Output('csv-selector', 'options'),
+        Input('refresh-files-interval', 'n_intervals')
+    )
+    def refresh_csv_options(n):
+        # List CSV and .cands files in utils directory
+        files = [f for f in os.listdir(image_directory) if f.endswith('.csv') or f.endswith('.cands')]
+        return [{'label': f, 'value': f} for f in files]
+
     @app.callback(
         Output('dynamic-content', 'children'),
         Output('x-axis', 'options'),
@@ -45,16 +55,16 @@ def register_callbacks(app,df):
     )
     def update_data_and_controls(selected_csv, n_intervals, auto_refresh_values, interval_value, last_mod_time):
         if not selected_csv:
-            # No CSV selected, reset everything
+            # No CSV selected: reset everything
             return (
                 html.Div("Please select a CSV."),
                 [], [], None, None,
                 [], [],
                 5000,
-                ""  # keep default interval
+                ""
             )
 
-        # Check file mod time
+        # Get current file modification time
         try:
             current_mod_time = check_file_mod_time(selected_csv)
         except Exception as e:
@@ -63,33 +73,33 @@ def register_callbacks(app,df):
         ctx = callback_context
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
 
-        # Auto-refresh logic: update only if needed
+        # Auto-refresh logic: only update if file changed
         if triggered_id == 'interval-component':
             if not auto_refresh_values or 'enabled' not in auto_refresh_values:
                 raise PreventUpdate
             if last_mod_time and float(last_mod_time) == current_mod_time:
                 raise PreventUpdate
 
-        # Load the CSV
+        # Load CSV data
         try:
             df_new = load_csv_to_df(selected_csv)
         except Exception as e:
             return (html.Div(f"Error parsing file: {e}"), [], [], None, None, [], [], 5000, "")
 
-        # Update cache
+        # Update cache with latest mod time
         file_mod_times[selected_csv] = current_mod_time
 
-        # Prepare dropdown options - numeric columns only
+        # Columns for dropdowns and table
         numeric_cols = [col for col in ['MJD', 'Burst_DM', 'S/N'] if col in df_new and pd.api.types.is_numeric_dtype(df_new[col])]
         visible_cols = [col for col in ['MJD', 'Burst_DM', 'S/N', 'ImageFilename'] if col in df_new]
 
         options = [{'label': col, 'value': col} for col in numeric_cols]
 
-        # Defaults for x and y axis dropdown values
+        # Defaults for x and y axis dropdowns
         x_val = numeric_cols[0] if numeric_cols else None
         y_val = numeric_cols[1] if len(numeric_cols) > 1 else (numeric_cols[0] if numeric_cols else None)
 
-        # Prepare data and columns for DataTable
+        # Prepare table data and columns
         table_data = df_new[visible_cols].to_dict('records')
         table_columns = [{"name": col, "id": col} for col in visible_cols]
 
@@ -111,11 +121,10 @@ def register_callbacks(app,df):
         Input("y-axis", "value"),
         Input("x-scale", "value"),
         Input("y-scale", "value"),
-        Input('main-table', 'derived_virtual_data'),  # <- Use derived virtual data
-        State('main-table', 'data'),  # <- Add fallback source
+        Input('main-table', 'derived_virtual_data'),  # filtered data if any
+        State('main-table', 'data'),  # fallback to full data
     )
     def update_figure(x_col, y_col, x_scale, y_scale, table_data_virtual, table_data_fallback):
-    # Use filtered data if available, else use full table
         table_data = table_data_virtual if table_data_virtual is not None else table_data_fallback
 
         if not table_data:
