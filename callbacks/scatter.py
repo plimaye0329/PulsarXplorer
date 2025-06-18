@@ -33,20 +33,22 @@ def register_callbacks(app):
         Input('refresh-files-interval', 'n_intervals')
     )
     def refresh_csv_options(n):
-        # List CSV and .cands files in utils directory
         files = [f for f in os.listdir(image_directory) if f.endswith('.csv') or f.endswith('.cands')]
         return [{'label': f, 'value': f} for f in files]
 
     @app.callback(
         Output('dynamic-content', 'children'),
-        Output('x-axis', 'options'),
-        Output('y-axis', 'options'),
-        Output('x-axis', 'value'),
-        Output('y-axis', 'value'),
         Output('main-table', 'data'),
         Output('main-table', 'columns'),
         Output('interval-component', 'interval'),
         Output('last-modified-timestamp', 'data'),
+        Output('x-axis', 'options'),
+        Output('y-axis', 'options'),
+        Output('x-axis', 'value'),
+        Output('y-axis', 'value'),
+        Output('file-load-alert', 'children'),
+        Output('file-load-alert', 'color'),
+        Output('file-load-alert', 'is_open'),
         Input('csv-selector', 'value'),
         Input('interval-component', 'n_intervals'),
         Input('auto-refresh-toggle', 'value'),
@@ -55,65 +57,69 @@ def register_callbacks(app):
     )
     def update_data_and_controls(selected_csv, n_intervals, auto_refresh_values, interval_value, last_mod_time):
         if not selected_csv:
-            # No CSV selected: reset everything
             return (
-                html.Div("Please select a CSV."),
-                [], [], None, None,
-                [], [],
-                5000,
-                ""
+                html.Div("Please select a CSV."), [], [], 5000, "",
+                [], [], None, None, "","", False
             )
 
-        # Get current file modification time
         try:
             current_mod_time = check_file_mod_time(selected_csv)
         except Exception as e:
-            return (html.Div(f"Error loading file: {e}"), [], [], None, None, [], [], 5000, "")
+            return (html.Div(f"Error loading file: {e}"), [], [], 5000, "", [], [], None, None)
 
         ctx = callback_context
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
 
-        # Auto-refresh logic: only update if file changed
         if triggered_id == 'interval-component':
             if not auto_refresh_values or 'enabled' not in auto_refresh_values:
                 raise PreventUpdate
             if last_mod_time and float(last_mod_time) == current_mod_time:
                 raise PreventUpdate
 
-        # Load CSV data
         try:
             df_new = load_csv_to_df(selected_csv)
         except Exception as e:
-            return (html.Div(f"Error parsing file: {e}"), [], [], None, None, [], [], 5000, "")
+            return (html.Div(f"Error parsing file: {e}"), [], [], 5000, "", [], [], None, None)
 
-        # Update cache with latest mod time
         file_mod_times[selected_csv] = current_mod_time
 
-        # Columns for dropdowns and table
         numeric_cols = [col for col in ['MJD', 'Burst_DM', 'S/N'] if col in df_new and pd.api.types.is_numeric_dtype(df_new[col])]
         visible_cols = [col for col in ['MJD', 'Burst_DM', 'S/N', 'ImageFilename'] if col in df_new]
 
-        options = [{'label': col, 'value': col} for col in numeric_cols]
+        axis_options = [{'label': col, 'value': col} for col in numeric_cols]
+        x_val = 'MJD' if 'MJD' in numeric_cols else (numeric_cols[0] if numeric_cols else None)
+        y_val = 'Burst_DM' if 'Burst_DM' in numeric_cols else (numeric_cols[1] if len(numeric_cols) > 1 else x_val)
 
-        # Defaults for x and y axis dropdowns
-        x_val = numeric_cols[0] if numeric_cols else None
-        y_val = numeric_cols[1] if len(numeric_cols) > 1 else (numeric_cols[0] if numeric_cols else None)
-
-        # Prepare table data and columns
         table_data = df_new[visible_cols].to_dict('records')
         table_columns = [{"name": col, "id": col} for col in visible_cols]
 
+        # Determine if alert should show
+        if triggered_id == 'csv-selector':
+            alert_msg = f"Successfully loaded {selected_csv}"
+            alert_color = "success"
+            alert_open = True
+        else:
+            alert_msg = ""
+            alert_color = ""
+            alert_open = False
+
         return (
             html.Div(f"Loaded: {selected_csv}"),
-            options,
-            options,
-            x_val,
-            y_val,
             table_data,
             table_columns,
             interval_value or 5000,
-            current_mod_time
+            current_mod_time,
+            axis_options,
+            axis_options,
+            x_val,
+            y_val,
+            alert_msg,
+            alert_color,
+            alert_open
         )
+
+
+        
 
     @app.callback(
         Output("scatter-plot", "figure"),
@@ -121,8 +127,8 @@ def register_callbacks(app):
         Input("y-axis", "value"),
         Input("x-scale", "value"),
         Input("y-scale", "value"),
-        Input('main-table', 'derived_virtual_data'),  # filtered data if any
-        State('main-table', 'data'),  # fallback to full data
+        Input('main-table', 'derived_virtual_data'),
+        State('main-table', 'data'),
     )
     def update_figure(x_col, y_col, x_scale, y_scale, table_data_virtual, table_data_fallback):
         table_data = table_data_virtual if table_data_virtual is not None else table_data_fallback
@@ -212,3 +218,4 @@ def register_callbacks(app):
         ], id='image-modal', is_open=True, centered=True, backdrop="static", keyboard=False)
 
         return modal, {'display': 'block'}
+

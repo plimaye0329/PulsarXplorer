@@ -7,43 +7,35 @@ from dash import dash_table
 DATA_FOLDER = './utils/'
 
 def get_csv_files():
-    # Read folder fresh every time this is called
     return [f for f in os.listdir(DATA_FOLDER) if f.endswith('.csv') or f.endswith('.cands')]
 
 def create_layout():
-    interval_options = [
-        {'label': '5 seconds', 'value': 5000},
-        {'label': '30 seconds', 'value': 30000},
-        {'label': '500 seconds', 'value': 500000},
-    ]
-    
-
-
-    
-    
     return dbc.Container([
         dcc.Store(id='clicked-point'),
         dcc.Store(id='click-counter', data=0),
         dcc.Store(id='clear-clickdata', data=False),
-        html.Button(id='close-popup', style={'display': 'none'}),
-        dcc.Interval(id='interval-component', interval=5000, n_intervals=0),
         dcc.Store(id='cached-csv-data'),
         dcc.Store(id='last-modified-timestamp', data=""),
+        html.Button(id='close-popup', style={'display': 'none'}),
 
-        # NEW interval to refresh CSV file list every 10 seconds
-        dcc.Interval(id='refresh-files-interval', interval=10*1000, n_intervals=0),
+        dcc.Interval(id='interval-component', interval=5000, n_intervals=0),
+        dcc.Interval(id='refresh-files-interval', interval=10000, n_intervals=0),
 
         dbc.Row([
-            # Sidebar controls
+            # Sidebar
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader(html.H4("Selection Panel", className="mb-0", style={"color": "black"})),
                     dbc.CardBody([
-                        html.H2("TransientXplorer", className="display-5 mb-3", style={"color": "black"}),
-                        html.P(
-                            "Interactive tool for exploring transient burst data.",
-                            className="text-muted fst-italic"
+                        dbc.Alert(
+                            id='file-load-alert',
+                            is_open=False,
+                            duration=4000,
+                            dismissable=True
                         ),
+                        html.H2("TransientXplorer", className="display-5 mb-3", style={"color": "black"}),
+                        html.P("Interactive tool for exploring transient burst data.",
+                               className="text-muted fst-italic"),
 
                         dbc.Checklist(
                             id='auto-refresh-toggle',
@@ -57,7 +49,7 @@ def create_layout():
                         dcc.Input(
                             id='interval-input',
                             type='number',
-                            value=5000,  # default 5000 ms = 5 sec
+                            value=5000,
                             min=1000,
                             step=500,
                             style={"marginBottom": "15px", "width": "100%"}
@@ -66,7 +58,7 @@ def create_layout():
                         dbc.Label("Select CSV file", className="mt-3 fw-semibold", style={"color": "black"}),
                         dcc.Dropdown(
                             id='csv-selector',
-                            options=[],  # start empty, populated dynamically by callback
+                            options=[],  # Populated dynamically
                             placeholder='Choose a CSV file',
                             style={"color": "black"},
                             className="mb-3"
@@ -74,7 +66,13 @@ def create_layout():
                         html.Hr(),
 
                         html.Label("X-axis:", style={"color": "black"}),
-                        dcc.Dropdown(id='x-axis', options=[], value=None, style={"color": "black"}, persistence=True),
+                        dcc.Dropdown(
+                            id='x-axis',
+                            options=[],  # Dynamically populated from numeric columns
+                            placeholder='Select X-axis column',
+                            style={"color": "black"},
+                            persistence=True
+                        ),
 
                         html.Label("X-axis Scale:", style={"color": "black"}),
                         dcc.RadioItems(
@@ -86,7 +84,13 @@ def create_layout():
                         ),
 
                         html.Label("Y-axis:", style={"color": "black"}),
-                        dcc.Dropdown(id='y-axis', options=[], value=None, style={"color": "black"}, persistence=True),
+                        dcc.Dropdown(
+                            id='y-axis',
+                            options=[],  # Dynamically populated from numeric columns
+                            placeholder='Select Y-axis column',
+                            style={"color": "black"},
+                            persistence=True
+                        ),
 
                         html.Label("Y-axis Scale:", style={"color": "black"}),
                         dcc.RadioItems(
@@ -105,7 +109,7 @@ def create_layout():
                 }),
             ], width=3),
 
-            # Main content (Graph + Table together)
+            # Main Content
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader(html.H4("Monitoring Interface", className="mb-0")),
@@ -113,7 +117,7 @@ def create_layout():
                         dcc.Graph(id="scatter-plot", style={"marginBottom": "30px"}),
                         dash_table.DataTable(
                             id='main-table',
-                            columns=[],  # will be populated dynamically in your callbacks
+                            columns=[],
                             data=[],
                             page_size=6,
                             filter_action='native',
@@ -129,3 +133,4 @@ def create_layout():
             ], width=9),
         ], className="mt-4 gx-4 bg-dark")
     ], fluid=True)
+
