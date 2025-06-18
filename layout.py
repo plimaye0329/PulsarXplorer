@@ -16,14 +16,10 @@ def create_layout():
         {'label': '30 seconds', 'value': 30000},
         {'label': '500 seconds', 'value': 500000},
     ]
+    
 
-    interval_selector = dcc.RadioItems(
-        id='interval-selector',
-        options=interval_options,
-        value=5000,  # default to 5 seconds
-        labelStyle={'display': 'inline-block', 'marginRight': '15px'},
-        style={"color": "black", "marginBottom": "15px"}
-    )
+
+    
     
     return dbc.Container([
         dcc.Store(id='clicked-point'),
@@ -57,7 +53,15 @@ def create_layout():
                             style={"color": "black", "marginBottom": "15px"}
                         ),
 
-                        interval_selector,
+                        dbc.Label("Refresh interval (ms):", style={"color": "black"}),
+                        dcc.Input(
+                            id='interval-input',
+                            type='number',
+                            value=5000,  # default 5000 ms = 5 sec
+                            min=1000,
+                            step=500,
+                            style={"marginBottom": "15px", "width": "100%"}
+                        ),
 
                         dbc.Label("Select CSV file", className="mt-3 fw-semibold", style={"color": "black"}),
                         dcc.Dropdown(

@@ -50,7 +50,7 @@ def register_callbacks(app):
         Input('csv-selector', 'value'),
         Input('interval-component', 'n_intervals'),
         Input('auto-refresh-toggle', 'value'),
-        Input('interval-selector', 'value'),
+        Input('interval-input', 'value'),
         State('last-modified-timestamp', 'data'),
     )
     def update_data_and_controls(selected_csv, n_intervals, auto_refresh_values, interval_value, last_mod_time):
