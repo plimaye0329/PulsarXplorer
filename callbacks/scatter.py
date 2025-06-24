@@ -219,3 +219,4 @@ def register_callbacks(app):
 
         return modal, {'display': 'block'}
 
+
