@@ -3,16 +3,16 @@ This tool provides a web application portal to monitor candidate profiles of Tra
 
 ## Running TransientXplorer:
 The application is embedded into a docker container. First clone the application to a local directory:
-$ git clone https://gitlab.mpcdf.mpg.de/pral/TransXplorer
+`$ git clone https://gitlab.mpcdf.mpg.de/pral/TransXplorer`
 
 Once you initialise the docker container, the application can be run using:
-$ python3 TransientXplorer.py
+`$ python3 TransientXplorer.py`
 
 This will open a portal to localhost:8050 which you can parse from your local web browser.
 
 
 
-Make a directory `\utils' within the directory where you cloned the tool. 
+Make a directory `\utils` within the directory where you cloned the tool. 
 
 Run TransientX (Men & Barr 2024) such that the output PNG files and candidate csv file are written to `\utils'. 
 
