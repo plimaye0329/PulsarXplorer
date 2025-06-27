@@ -140,6 +140,13 @@ def register_callbacks(app):
 
         if x_col not in df or y_col not in df or 'S/N' not in df:
             return px.scatter(title="Invalid or missing columns.")
+        
+        axis_label_map = {
+            'MJD': 'MJD',
+            'Burst_DM': 'DM (pc cm⁻³)',
+            'width': 'Width (ms)',
+            'S/N': 'S/N Ratio',
+        }
 
         fig = px.scatter(
 
@@ -157,7 +164,15 @@ def register_callbacks(app):
             hovertemplate=None,
             customdata=df[[col for col in ['ImageFilename', 'MJD', 'Burst_DM'] if col in df]].values
         )
-        fig.update_layout(xaxis_type=x_scale, yaxis_type=y_scale)
+        fig.update_layout(
+            xaxis_type=x_scale,
+            yaxis_type=y_scale,
+            xaxis_title=axis_label_map.get(x_col, x_col),
+            yaxis_title=axis_label_map.get(y_col, y_col),
+            coloraxis_colorbar=dict(
+                title="width (ms)"  # <- This adds your desired label
+            )
+        )
 
         return fig
 
@@ -219,10 +234,10 @@ def register_callbacks(app):
                 }),
                 html.P(f"MJD: {mjd}", style={"fontSize": "12px", "marginTop": "10px"}),
                 html.P(f"Burst DM: {burst_dm}", style={"fontSize": "12px"}),
-                html.A("View Full Image", href=f"/assets/Images/{image_filename}", target="_blank", style={
-                    "display": "block", "marginTop": "12px", "textAlign": "center", "color": "#007bff",
-                    "fontWeight": "bold", "textDecoration": "underline", "fontSize": "14px"
-                })
+                #html.A("View Full Image", href=f"/assets/Images/{image_filename}", target="_blank", style={
+                #    "display": "block", "marginTop": "12px", "textAlign": "center", "color": "#007bff",
+                #    "fontWeight": "bold", "textDecoration": "underline", "fontSize": "14px"
+                
             ])
         ], id='image-modal', is_open=True, centered=True, backdrop="static", keyboard=False)
 
