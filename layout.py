@@ -45,13 +45,13 @@ def create_layout():
                             style={"color": "black", "marginBottom": "15px"}
                         ),
 
-                        dbc.Label("Refresh interval (ms):", style={"color": "black"}),
+                        dbc.Label("Refresh interval (s):", style={"color": "black"}),
                         dcc.Input(
                             id='interval-input',
                             type='number',
-                            value=5000,
-                            min=1000,
-                            step=500,
+                            value=5,
+                            min=1,
+                            step=1,
                             style={"marginBottom": "15px", "width": "100%"}
                         ),
 

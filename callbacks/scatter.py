@@ -21,7 +21,7 @@ def load_csv_to_df(filename: str) -> pd.DataFrame:
     """Load CSV file into a DataFrame with proper preprocessing."""
     csv_path = os.path.join(image_directory, filename)
     df_new = pd.read_csv(csv_path, delim_whitespace=True, header=None)
-    df_new.columns = ['col1', 'col2', 'MJD', 'Burst_DM', 'col5', 'S/N',
+    df_new.columns = ['col1', 'col2', 'MJD', 'Burst_DM', 'width', 'S/N',
                       'col7', 'col8', 'ImagePath', 'col10', 'col11']
     # Extract just the image filename from the full path
     df_new['ImageFilename'] = df_new['ImagePath'].apply(lambda x: os.path.basename(x))
@@ -83,8 +83,8 @@ def register_callbacks(app):
 
         file_mod_times[selected_csv] = current_mod_time
 
-        numeric_cols = [col for col in ['MJD', 'Burst_DM', 'S/N'] if col in df_new and pd.api.types.is_numeric_dtype(df_new[col])]
-        visible_cols = [col for col in ['MJD', 'Burst_DM', 'S/N', 'ImageFilename'] if col in df_new]
+        numeric_cols = [col for col in ['MJD', 'Burst_DM', 'width', 'S/N', 'ImageFilename'] if col in df_new and pd.api.types.is_numeric_dtype(df_new[col])]
+        visible_cols = [col for col in ['MJD', 'Burst_DM', 'width', 'S/N', 'ImageFilename'] if col in df_new]
 
         axis_options = [{'label': col, 'value': col} for col in numeric_cols]
         x_val = 'MJD' if 'MJD' in numeric_cols else (numeric_cols[0] if numeric_cols else None)
@@ -107,7 +107,7 @@ def register_callbacks(app):
             html.Div(f"Loaded: {selected_csv}"),
             table_data,
             table_columns,
-            interval_value or 5000,
+            (interval_value or 5)*1000,
             current_mod_time,
             axis_options,
             axis_options,
@@ -141,7 +141,16 @@ def register_callbacks(app):
         if x_col not in df or y_col not in df or 'S/N' not in df:
             return px.scatter(title="Invalid or missing columns.")
 
-        fig = px.scatter(df, x=x_col, y=y_col, size='S/N', size_max=20)
+        fig = px.scatter(
+
+            df,
+            x=x_col,
+            y=y_col,
+            size='S/N',
+            color='width',  # <- Add colormap based on width
+            size_max=20,
+            color_continuous_scale='Viridis',  # Or any other scale you prefer
+        )
 
         fig.update_traces(
             hoverinfo="none",
