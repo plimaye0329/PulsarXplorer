@@ -22,17 +22,8 @@ git clone https://github.com/your-username/TransientXplorer.git
 cd TransientXplorer
 ```
 ### 2. Build Docker Image
-```docker build -t transientxplorer . ```(You only need to do this once)
+```docker build -t transientxplorer .  (You only need to do this once)```
 
-### Ensure your data in your path is structured properly:
-```
-/home/user/Desktop/test_cands/
-  ├── burst1.png
-  ├── burst2.png
-  ├── metadata.cands
-  └── 
-  
-    ```
   
 
 ### 3. Run the container:
