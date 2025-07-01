@@ -5,9 +5,17 @@ import plotly.express as px
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from utils.image import encode_image
+import argparse
+
+# Parse command-line arguments
+#parser = argparse.ArgumentParser(description='Dash App for CSV and Images')
+#parser.add_argument('--csvdir', type=str, default='./utils/', help='Directory containing CSV files and images')
+#args = parser.parse_args()
+
+#image_directory = args.csvdir
 
 # Directory where CSVs and images are stored
-image_directory = './utils/'
+image_directory = '/data'
 
 # Cache for file modification times to optimize refresh
 file_mod_times = {}
