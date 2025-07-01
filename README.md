@@ -18,7 +18,7 @@ A lightweight Dash web application for exploring transient candidates interactiv
 ### 1. Clone this repository
 
 ```bash
-git clone https://github.com/your-username/TransientXplorer.git
+git clone https://github.com/pral/TransientXplorer
 cd TransientXplorer
 ```
 ### 2. Build Docker Image
@@ -34,17 +34,11 @@ docker run -it \
   transientxplorer \
   python3 /workspace/TransientXplorer.py 
   ```
+Here :
+ ```/home/user/Desktop/test_cands ``` is the path where your images and candidate files reside. 
+ ```/data```: is the directory within the container from where the app parses the data to visualise.
 
-### Directory Structure (Inside Container):
-```
-/workspace/
-  ├── TransientXplorer.py         # Main Dash app
-  ├── utils/                      # Helper scripts (optional)
-  ├── requirements.txt
-  └── ...
-/data/
-  └── [mounted image directory from host]
-  ```
+ After running the container, the web interface can be accessed from ```localhost:8050```
 
 
 For questions, bugs, or feature requests, open an issue or contact [limaye@mpifr-bonn.mpg.de].
