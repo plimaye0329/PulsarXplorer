@@ -31,7 +31,8 @@ cd TransientXplorer
   ├── burst2.png
   ├── metadata.cands
   └── 
-  `
+  
+    ```
   
 
 ### 3. Run the container:
