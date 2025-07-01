@@ -18,7 +18,7 @@ A lightweight Dash web application for exploring transient candidates interactiv
 ### 1. Clone this repository
 
 ```bash
-git clone https://github.com/pral/TransientXplorer
+git clone https://gitlab.mpcdf.mpg.de/pral/TransientXplorer.git
 cd TransientXplorer
 ```
 ### 2. Build Docker Image
