@@ -28,11 +28,7 @@ cd TransientXplorer
 
 ### 3. Run the container:
 ```
-docker run -it \
-  -v /home/user/Desktop/test_cands:/data \
-  -p 8050:8050 \
-  transientxplorer \
-  python3 /workspace/TransientXplorer.py 
+docker run -it -v /home/user/Desktop/test_cands:/data -p 8050:8050 transientxplorer python3 /workspace/TransientXplorer.py 
   ```
 Here :
  ```/home/user/Desktop/test_cands ``` is the path where your images and candidate files reside. 
