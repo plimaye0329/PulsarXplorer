@@ -1,25 +1,55 @@
 # TransientXplorer
-This tool provides a web application portal to monitor candidate profiles of TransientX blind and targeted single pulse searches.
 
-## Running TransientXplorer:
-The application is embedded into a docker container. First clone the application to a local directory:
-`$ git clone https://gitlab.mpcdf.mpg.de/pral/TransXplorer`
+A lightweight Dash web application for exploring transient candidates interactively using image data and associated metadata. Ideal for radio astronomy burst candidates or similar time-domain datasets.
 
-Once you initialise the docker container, the application can be run using:
-`$ python3 TransientXplorer.py`
+---
 
-This will open a portal to localhost:8050 which you can parse from your local web browser.
+## 🚀 Features
+
+- Interactive visualization of burst candidates
+- Filter and explore events by band, time, or other parameters
+- Responsive web UI powered by Plotly Dash
+- Dockerized for easy deployment and portability
+
+---
+
+## 🐳 Run via Docker
+
+### 1. Clone this repository
+
+```bash
+git clone https://github.com/your-username/TransientXplorer.git
+cd TransientXplorer
+
+docker build -t transientxplorer . # Build the docker image (You only need to do this once)
+
+### Ensure your data in your path is structured properly:
+
+/home/user/Desktop/test_cands/
+  ├── burst1.png
+  ├── burst2.png
+  ├── metadata.cands
+  └── ...
+### Run the container:
+docker run -it \
+  -v /home/user/Desktop/test_cands:/data \
+  -p 8050:8050 \
+  transientxplorer \
+  python3 /workspace/TransientXplorer.py 
+
+### Directory Structure (Inside Container):
+
+/workspace/
+  ├── TransientXplorer.py         # Main Dash app
+  ├── utils/                      # Helper scripts (optional)
+  ├── requirements.txt
+  └── ...
+/data/
+  └── [mounted image directory from host]
 
 
+For questions, bugs, or feature requests, open an issue or contact [limaye@mpifr-bonn.mpg.de].
 
-Make a directory `\utils` within the directory where you cloned the tool. 
-
-Run TransientX (Men & Barr 2024) such that the output PNG files and candidate csv file are written to `\utils'. 
-
-Open the web interface and select the relevant candidate file from the drop-down menu. This will create a monitoring table and graph.
-You can interactivele select which parameters you want to visualize from the drop-down selectors.
-
-The web interface dynamically updates as the transientX search proceeds. The refresh rate can be modified to user-specific values through the refresh interval selector
 
 
 
