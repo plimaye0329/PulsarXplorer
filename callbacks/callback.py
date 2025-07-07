@@ -5,14 +5,6 @@ import plotly.express as px
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from utils.image import encode_image
-import argparse
-
-# Parse command-line arguments
-#parser = argparse.ArgumentParser(description='Dash App for CSV and Images')
-#parser.add_argument('--csvdir', type=str, default='./utils/', help='Directory containing CSV files and images')
-#args = parser.parse_args()
-
-#image_directory = args.csvdir
 
 # Directory where CSVs and images are stored
 image_directory = '/data'
@@ -21,17 +13,14 @@ image_directory = '/data'
 file_mod_times = {}
 
 def check_file_mod_time(filename: str) -> float:
-    """Return the last modification time for a given file."""
     csv_path = os.path.join(image_directory, filename)
     return os.path.getmtime(csv_path)
 
 def load_csv_to_df(filename: str) -> pd.DataFrame:
-    """Load CSV file into a DataFrame with proper preprocessing."""
     csv_path = os.path.join(image_directory, filename)
     df_new = pd.read_csv(csv_path, delim_whitespace=True, header=None)
     df_new.columns = ['col1', 'col2', 'MJD', 'Burst_DM', 'width', 'S/N',
                       'col7', 'col8', 'ImagePath', 'col10', 'col11']
-    # Extract just the image filename from the full path
     df_new['ImageFilename'] = df_new['ImagePath'].apply(lambda x: os.path.basename(x))
     return df_new
 
@@ -73,7 +62,7 @@ def register_callbacks(app):
         try:
             current_mod_time = check_file_mod_time(selected_csv)
         except Exception as e:
-            return (html.Div(f"Error loading file: {e}"), [], [], 5000, "", [], [], None, None)
+            return (html.Div(f"Error loading file: {e}"), [], [], 5000, "", [], [], None, None, "", "", False)
 
         ctx = callback_context
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
@@ -87,11 +76,11 @@ def register_callbacks(app):
         try:
             df_new = load_csv_to_df(selected_csv)
         except Exception as e:
-            return (html.Div(f"Error parsing file: {e}"), [], [], 5000, "", [], [], None, None)
+            return (html.Div(f"Error parsing file: {e}"), [], [], 5000, "", [], [], None, None, "", "", False)
 
         file_mod_times[selected_csv] = current_mod_time
 
-        numeric_cols = [col for col in ['MJD', 'Burst_DM', 'width', 'S/N', 'ImageFilename'] if col in df_new and pd.api.types.is_numeric_dtype(df_new[col])]
+        numeric_cols = [col for col in ['MJD', 'Burst_DM', 'width', 'S/N'] if col in df_new and pd.api.types.is_numeric_dtype(df_new[col])]
         visible_cols = [col for col in ['MJD', 'Burst_DM', 'width', 'S/N', 'ImageFilename'] if col in df_new]
 
         axis_options = [{'label': col, 'value': col} for col in numeric_cols]
@@ -101,7 +90,6 @@ def register_callbacks(app):
         table_data = df_new[visible_cols].to_dict('records')
         table_columns = [{"name": col, "id": col} for col in visible_cols]
 
-        # Determine if alert should show
         if triggered_id == 'csv-selector':
             alert_msg = f"Successfully loaded {selected_csv}"
             alert_color = "success"
@@ -125,9 +113,6 @@ def register_callbacks(app):
             alert_color,
             alert_open
         )
-
-
-        
 
     @app.callback(
         Output("scatter-plot", "figure"),
@@ -157,14 +142,13 @@ def register_callbacks(app):
         }
 
         fig = px.scatter(
-
             df,
             x=x_col,
             y=y_col,
             size='S/N',
-            color='width',  # <- Add colormap based on width
+            color='width',
             size_max=20,
-            color_continuous_scale='Viridis',  # Or any other scale you prefer
+            color_continuous_scale='Viridis',
         )
 
         fig.update_traces(
@@ -178,7 +162,7 @@ def register_callbacks(app):
             xaxis_title=axis_label_map.get(x_col, x_col),
             yaxis_title=axis_label_map.get(y_col, y_col),
             coloraxis_colorbar=dict(
-                title="width (ms)"  # <- This adds your desired label
+                title="width (ms)"
             )
         )
 
@@ -188,67 +172,71 @@ def register_callbacks(app):
         Output('clicked-point', 'data'),
         Output('click-counter', 'data'),
         Input('scatter-plot', 'clickData'),
-        Input('main-table', 'selected_rows'),
+        Input('main-table','active_cell'),
         Input('close-popup', 'n_clicks'),
-        State('main-table', 'data'),
+        State('main-table', 'derived_virtual_data'),
         State('click-counter', 'data'),
     )
-    def update_clicked_point(clickData, selected_rows, close_clicks, table_data, click_counter):
+    def update_clicked_point(clickData, active_cell, close_clicks, virtual_data, click_counter):
         ctx = callback_context
         if not ctx.triggered:
             return no_update, no_update
+
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]
 
         if trigger == 'scatter-plot' and clickData:
             return clickData["points"][0], (click_counter or 0) + 1
-        elif trigger == 'main-table' and selected_rows:
+
+        elif trigger == 'main-table' and active_cell:
+            if not virtual_data or active_cell.get('row') is None:
+                return no_update, no_update
             try:
-                df = pd.DataFrame(table_data)
-                row = df.iloc[selected_rows[0]]
+                row = virtual_data[active_cell['row']]
                 customdata = [row.get(k, '') for k in ['ImageFilename', 'MJD', 'Burst_DM']]
                 return {"customdata": customdata}, (click_counter or 0) + 1
-            except Exception:
+            except Exception as e:
+                print(f"Error accessing row: {e}")
                 return no_update, no_update
+
         elif trigger == 'close-popup':
             return None, 0
+
         return no_update, no_update
 
     @app.callback(
-        Output('image-popup', 'children'),
-        Output('image-popup', 'style'),
+        Output('image-modal', 'is_open'),
+        Output('popup-image', 'src'),
+        Output('popup-mjd', 'children'),
+        Output('popup-dm', 'children'),
         Input('clicked-point', 'data'),
         Input('click-counter', 'data'),
+        Input('close-popup', 'n_clicks'),
+        State('image-modal', 'is_open'),
     )
-    def display_click_popup(point_data, _):
-        if not point_data or 'customdata' not in point_data:
-            return "", {'display': 'none'}
+    def toggle_modal(point_data, click_counter, close_clicks, is_open):
+        ctx = callback_context
+        if not ctx.triggered:
+            return False, None, "", ""
 
-        image_filename, mjd, burst_dm = point_data["customdata"]
-        image_path = os.path.join(image_directory, image_filename)
-        encoded = encode_image(image_path)
+        trigger = ctx.triggered[0]['prop_id'].split('.')[0]
 
-        if not encoded:
-            return "", {'display': 'none'}
+        # Close modal on close button click
+        if trigger == 'close-popup':
+            return False, None, "", ""
 
-        modal = dbc.Modal([
-            dbc.ModalHeader(
-                dbc.Button('✖', id='close-popup', n_clicks=0, color='link',
-                           style={'fontSize': '20px', 'float': 'right'}),
-                close_button=False
-            ),
-            dbc.ModalBody([
-                html.Img(src=f"data:image/png;base64,{encoded}", style={
-                    "width": "100%", "height": "auto", "border": "2px solid #ccc", "display": "block", "margin": "0 auto"
-                }),
-                html.P(f"MJD: {mjd}", style={"fontSize": "12px", "marginTop": "10px"}),
-                html.P(f"Burst DM: {burst_dm}", style={"fontSize": "12px"}),
-                #html.A("View Full Image", href=f"/assets/Images/{image_filename}", target="_blank", style={
-                #    "display": "block", "marginTop": "12px", "textAlign": "center", "color": "#007bff",
-                #    "fontWeight": "bold", "textDecoration": "underline", "fontSize": "14px"
-                
-            ])
-        ], id='image-modal', is_open=True, centered=True, backdrop="static", keyboard=False)
+        # Show modal on scatter-plot or table click
+        if trigger in ['clicked-point', 'click-counter'] and point_data and 'customdata' in point_data:
+            image_filename, mjd, burst_dm = point_data["customdata"]
+            image_path = os.path.join(image_directory, image_filename)
+            encoded = encode_image(image_path)
+            if not encoded:
+                return False, None, "", ""
 
-        return modal, {'display': 'block'}
+            src = f"data:image/png;base64,{encoded}"
+            mjd_text = f"MJD: {mjd}"
+            dm_text = f"Burst DM: {burst_dm}"
+            return True, src, mjd_text, dm_text
+
+        return is_open, no_update, no_update, no_update
 
 

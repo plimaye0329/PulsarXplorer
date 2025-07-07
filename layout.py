@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import dash
 from dash import dash_table
 
-DATA_FOLDER = './utils/'
+DATA_FOLDER = '/data'
 
 def get_csv_files():
     return [f for f in os.listdir(DATA_FOLDER) if f.endswith('.csv') or f.endswith('.cands')]
@@ -126,7 +126,33 @@ def create_layout():
                             selected_rows=[],
                             style_table={'overflowX': 'auto'},
                         ),
-                        html.Div(id='image-popup', style={'display': 'none'}),
+
+                        # Modal for Image Popup
+                        dbc.Modal(
+                            [
+                                dbc.ModalHeader(
+                                    dbc.Button('✖', id='close-popup', n_clicks=0, color='link',
+                                               style={'fontSize': '20px', 'float': 'right'}),
+                                    close_button=False
+                                ),
+                                dbc.ModalBody(
+                                    [
+                                        html.Img(id='popup-image', style={
+                                            "width": "100%", "height": "auto", "border": "2px solid #ccc",
+                                            "display": "block", "margin": "0 auto"
+                                        }),
+                                        html.P(id='popup-mjd', style={"fontSize": "12px", "marginTop": "10px"}),
+                                        html.P(id='popup-dm', style={"fontSize": "12px"}),
+                                    ]
+                                ),
+                            ],
+                            id='image-modal',
+                            is_open=False,
+                            centered=True,
+                            backdrop="static",
+                            keyboard=False,
+                        ),
+
                         html.Div(id='dynamic-content', style={"marginTop": "20px"})
                     ])
                 ], className="shadow-sm", style={"borderRadius": "12px"})
