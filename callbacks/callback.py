@@ -1,10 +1,13 @@
 import os
 import pandas as pd
+import numpy as np
 from dash import html, Input, Output, State, callback_context, no_update
 import plotly.express as px
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from utils.image import encode_image
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 
 # Directory where CSVs and images are stored
 image_directory = '/data'
@@ -133,7 +136,7 @@ def register_callbacks(app):
 
         if x_col not in df or y_col not in df or 'S/N' not in df:
             return px.scatter(title="Invalid or missing columns.")
-        
+    
         axis_label_map = {
             'MJD': 'MJD',
             'Burst_DM': 'DM (pc cm⁻³)',
@@ -141,29 +144,56 @@ def register_callbacks(app):
             'S/N': 'S/N Ratio',
         }
 
-        fig = px.scatter(
-            df,
-            x=x_col,
-            y=y_col,
-            size='S/N',
-            color='width',
-            size_max=20,
-            color_continuous_scale='Viridis',
+    # Create subplots: main plot and vertical histogram
+        fig = make_subplots(
+            rows=1, cols=2,
+            column_widths=[0.8, 0.2],
+            shared_yaxes=True,
+            horizontal_spacing=0.02,
+            specs=[[{"type": "scatter"}, {"type": "histogram"}]]
+        )
+        sn = df['S/N']
+        sn_scaled = 10 + 15 * (sn - sn.min()) / (sn.max() - sn.min() + 1e-9)
+
+    # Main scatter plot
+        fig.add_trace(
+            go.Scatter(
+                x=df[x_col],
+                y=df[y_col],
+                mode='markers',
+                
+                marker=dict(
+                    size=sn_scaled,
+                    color=df['width'],
+                    colorscale='Viridis',
+                    showscale=True,
+                    colorbar=dict(title="Width (ms)")
+                ),
+                customdata=df[[col for col in ['ImageFilename', 'MJD', 'Burst_DM'] if col in df]].values,
+                hovertemplate=None,
+                showlegend=False,
+            ),
+            row=1, col=1
         )
 
-        fig.update_traces(
-            hoverinfo="none",
-            hovertemplate=None,
-            customdata=df[[col for col in ['ImageFilename', 'MJD', 'Burst_DM'] if col in df]].values
+    # Histogram for Y-axis
+        fig.add_trace(
+            go.Histogram(
+                y=df[y_col],
+                nbinsy=30,
+                marker=dict(color='gray'),
+                showlegend=False
+            ),
+            row=1, col=2
         )
+
         fig.update_layout(
             xaxis_type=x_scale,
             yaxis_type=y_scale,
             xaxis_title=axis_label_map.get(x_col, x_col),
             yaxis_title=axis_label_map.get(y_col, y_col),
-            coloraxis_colorbar=dict(
-                title="width (ms)"
-            )
+            hovermode="closest",
+            margin=dict(l=50, r=20, t=40, b=40),
         )
 
         return fig
