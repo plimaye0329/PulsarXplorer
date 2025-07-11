@@ -33,7 +33,19 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 
 ---
 
+## Web Interface Overview
 ![Web_Interface](examples/web_interface.png)
+
+\textbf{Panel Breakdown}:
+🧾 Left Panel (Controls)
+1. Select CSV file: Choose a .cands file from the list
+
+2. X/Y Axis: Change the axis variables (e.g., MJD, Burst_DM, etc.)
+
+3. Scale: Toggle between linear/log scale
+
+4. Auto Refresh: Refresh every N seconds to reload data
+
 
 
 ## 📬 Contact
