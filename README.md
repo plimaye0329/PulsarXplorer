@@ -36,15 +36,15 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 ## Web Interface Overview
 ![Web_Interface](examples/web_interface.png)
 
-\textbf{Panel Breakdown}:
-🧾 Left Panel (Controls)
-1. Select CSV file: Choose a .cands file from the list
+## 🧭 Panel Breakdown
 
-2. X/Y Axis: Change the axis variables (e.g., MJD, Burst_DM, etc.)
+### 🧾 Left Panel (Controls)
 
-3. Scale: Toggle between linear/log scale
+- **Select CSV file**: Choose a `.cands` file from the dropdown list.
+- **X/Y Axis**: Select which variables to display on the X and Y axes (e.g., `MJD`, `Burst_DM`, etc.).
+- **Scale**: Toggle between `linear` and `log` scale for each axis.
+- **Auto Refresh**: Enable to refresh the data view automatically every N seconds.
 
-4. Auto Refresh: Refresh every N seconds to reload data
 
 
 
