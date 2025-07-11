@@ -40,7 +40,6 @@ For questions, bugs, or feature requests, open an issue or contact:
 
 
 
-![web interface](file:///home/dell/Pictures/Screenshots/Screenshot%20from%202025-07-11%2015-16-50.png)
 
 
 
