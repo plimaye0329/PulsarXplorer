@@ -47,18 +47,15 @@ After running the container, open your browser and go to:
 
 ---
 
-## 🧳 Run via Singularity
+##  Run via Singularity
 
 If you do not have Docker or root access, you can use Singularity. A `transientxplorer.sif` file is included in the cloned repository.
 
 ```bash
-singularity exec \
-  --bind /home/dell/Desktop/MPIfR/utils:/data \
-  transientxplorer.sif \
-  python3 TransientXplorer.py
+singularity exec --bind /home/candidates:/data transientxplorer.sif python3 TransientXplorer.py
 ```
 
-Make sure to replace `/home/dell/Desktop/MPIfR/utils` with the actual path to your data directory. The application will serve on **http://localhost:8050**
+Make sure to replace `/home/candidates` with the actual path to your data directory. The application will serve on **http://localhost:8050**
 
 ---
 
