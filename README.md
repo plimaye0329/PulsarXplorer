@@ -28,13 +28,20 @@ cd TransientXplorer
 
 ### 3. Run the container:
 ```
-docker run -it -v /home/user/Desktop/test_cands:/data -p 8050:8050 transientxplorer python3 /workspace/TransientXplorer.py 
+docker run -it -v /home/user/Desktop/MPIfR/utils:/data -p 8050:8050 transientxplorer python3 /workspace/TransientXplorer.py 
   ```
 Here :
  ```/home/user/Desktop/test_cands ``` is the path where your images and candidate files reside. 
  ```/data```: is the directory within the container from where the app parses the data to visualise.
 
  After running the container, the web interface can be accessed from ```localhost:8050```
+ 
+### 4. Run via Singularity:
+
+You can find a transientxplorer.sif file in the path when you clone the repository. Run the app from the local git clone as follows:
+```
+singularity exec --bind /home/dell/Desktop/MPIfR/utils:/data transientxplorer.sif python3 TransientXplorer.py
+```
 
 
 For questions, bugs, or feature requests, open an issue or contact [limaye@mpifr-bonn.mpg.de].
