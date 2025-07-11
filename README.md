@@ -40,10 +40,20 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 
 ### 🧾 Left Panel (Controls)
 
-- **Select CSV file**: Choose a `.cands` file from the dropdown list.
-- **X/Y Axis**: Select which variables to display on the X and Y axes (e.g., `MJD`, `Burst_DM`, etc.).
-- **Scale**: Toggle between `linear` and `log` scale for each axis.
-- **Auto Refresh**: Enable to refresh the data view automatically every N seconds.
+- **Select CSV file**: Choose a `.cands` file from the dropdown list
+- **X/Y Axis**: Select which variables to display on the X and Y axes (e.g., `MJD`, `Burst_DM`, etc.)
+- **Scale**: Toggle between `linear` and `log` scale for each axis
+- **Auto Refresh**: Enable to refresh the data view automatically every N seconds
+
+### 🧾 Rigth Panel (Visualization)
+
+- **Scatter Plot**: (Default)
+    - **X-axis**: MJD
+    - **Y-axis**: Dispersion Measure (pc cm^{-3})
+    - **Color**: Width (ms)
+    - **Size**: S/N (Signal-to-Noise Ratio)
+- Click any point to open the associated candidate image
+- Histogram: Shows the distribution of the Y-axis quantity
 
 
 
