@@ -38,14 +38,14 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 
 ## 🧭 Panel Breakdown
 
-### 🧾 Left Panel (Controls)
+###  Left Panel (Controls)
 
 - **Select CSV file**: Choose a `.cands` file from the dropdown list
 - **X/Y Axis**: Select which variables to display on the X and Y axes (e.g., `MJD`, `Burst_DM`, etc.)
 - **Scale**: Toggle between `linear` and `log` scale for each axis
 - **Auto Refresh**: Enable to refresh the data view automatically every N seconds
 
-### 🧾 Right Panel (Visualization)
+###  Right Panel (Visualization)
 
 - **Scatter Plot**: (Default)
     - **X-axis**: MJD
