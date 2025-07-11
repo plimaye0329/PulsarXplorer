@@ -45,7 +45,7 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 - **Scale**: Toggle between `linear` and `log` scale for each axis
 - **Auto Refresh**: Enable to refresh the data view automatically every N seconds
 
-### 🧾 Rigth Panel (Visualization)
+### 🧾 Right Panel (Visualization)
 
 - **Scatter Plot**: (Default)
     - **X-axis**: MJD
@@ -53,10 +53,13 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
     - **Color**: Width (ms)
     - **Size**: S/N (Signal-to-Noise Ratio)
 - Click any point to open the associated candidate image
-- Histogram: Shows the distribution of the Y-axis quantity
+- **Histogram**: Shows the distribution of the Y-axis quantity
 
-
-
+- **Tabular Data**:
+    - Shows the burst properties mentioned above and the TransientX PNG files
+    - The scatter plot can be filtered by applying filters on different burst properties
+        - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
+    - User can click on any tabular cell to open the associated candidate image
 
 ## 📬 Contact
 
