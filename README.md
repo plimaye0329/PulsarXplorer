@@ -33,6 +33,9 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 
 ---
 
+![Web_Interface](examples/web_interface.png)
+
+
 ## 📬 Contact
 
 For questions, bugs, or feature requests, open an issue or contact:  
