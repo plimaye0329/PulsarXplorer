@@ -13,7 +13,6 @@ A lightweight Dash web application for exploring transient candidates interactiv
 
 ---
 
-## 🐳 Run via Docker
 
 ### 1. Clone this repository
 
@@ -21,31 +20,6 @@ A lightweight Dash web application for exploring transient candidates interactiv
 git clone https://gitlab.mpcdf.mpg.de/pral/TransientXplorer.git
 cd TransientXplorer
 ```
-
-### 2. Build Docker Image
-
-```bash
-docker build -t transientxplorer .
-```
-
-### 3. Run the container
-
-```bash
-docker run -it \
-  -v /home/user/Desktop/MPIfR/utils:/data \
-  -p 8050:8050 \
-  transientxplorer \
-  python3 /workspace/TransientXplorer.py
-```
-
-Here:  
-- `/home/user/Desktop/MPIfR/utils` is the path where your images and candidate files reside.  
-- `/data` is the directory within the container from where the app parses the data to visualize.  
-
-After running the container, open your browser and go to:  
-**http://localhost:8050**
-
----
 
 ##  Run via Singularity
 
