@@ -21,15 +21,15 @@ git clone https://gitlab.mpcdf.mpg.de/pral/TransientXplorer.git
 cd TransientXplorer
 ```
 
-##  Run via Singularity
+##  Example Usage : Run via Singularity
 
 If you do not have Docker or root access, you can use Singularity. A `transientxplorer.sif` file is included in the cloned repository.
-
+There is example candidate file and images in ``` ./candidates ```. Run the script through singularity as follows:
 ```bash
-singularity exec --bind /home/candidates:/data transientxplorer.sif python3 TransientXplorer.py
+singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py
 ```
 
-Make sure to replace `/home/candidates` with the actual path to your data directory. The application will serve on **http://localhost:8050**
+Make sure to replace `./candidates` with the actual path to your data directory. The application will serve on **http://localhost:8050**
 
 ---
 
@@ -57,10 +57,13 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 
 - **Tabular Data**:
     - Shows the burst properties mentioned above and the TransientX PNG files
-    - The scatter plot can be filtered by applying filters on different burst properties
-        - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
+    
     - User can click on any tabular cell to open the associated candidate image
 
+### Additional features:
+- The margin between graph and table can be dragged to resize the layout according to your needs.
+- The scatter plot can be filtered by applying filters on different burst properties
+    - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
 ##  Contact
 
 For questions, bugs, or feature requests, open an issue or contact:  
