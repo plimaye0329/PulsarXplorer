@@ -30,7 +30,7 @@ Download the latest `.sif` from Zenodo:
 
 [Download TransientXplorer.sif from Zenodo](https://zenodo.org/records/15974012/files/transientxplorer.sif?download=1)  
 
-DOI: [10.5281/zenodo.15974012](https://doi.org/10.5281/zenodo.15974012)
+DOI: [10.5281/zenodo.15974011](https://doi.org/10.5281/zenodo.15974011)
 
 
 ###  Step 2: Run the app
@@ -82,8 +82,8 @@ If you use TransientXplorer in your work, please cite the Zenodo DOI:
   title        = {TransientXplorer: A lightweight Dash app for transient candidate exploration},
   year         = {2025},
   publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.XXXXXXX},
-  url          = {https://doi.org/10.5281/zenodo.XXXXXXX}
+  doi          = {10.5281/zenodo.15974011},
+  url          = {https://doi.org/10.5281/zenodo.15974011}
 }
 ```
 
