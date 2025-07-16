@@ -40,7 +40,7 @@ Make sure to replace `./candidates` with the actual path to your data directory.
 
 ###  Left Panel (Controls)
 
-- **Select CSV file**: Choose a `.cands` file from the dropdown list
+- **Select CSV file**: Choose a `.cands` file from the dropdown list (Note: The application only accepts .csv or .cands files)
 - **X/Y Axis**: Select which variables to display on the X and Y axes (e.g., `MJD`, `Burst_DM`, etc.)
 - **Scale**: Toggle between `linear` and `log` scale for each axis
 - **Auto Refresh**: Enable to refresh the data view automatically every N seconds
