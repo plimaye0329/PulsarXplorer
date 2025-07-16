@@ -20,18 +20,27 @@ A lightweight Dash web application for exploring transient candidates interactiv
 git clone https://gitlab.mpcdf.mpg.de/pral/TransientXplorer.git
 cd TransientXplorer
 ```
+## 🛰 Run with Singularity (No Docker or root access needed)
 
-##  Example Usage : Run via Singularity
+You can run the app using a pre-built Singularity image.
 
-If you do not have Docker or root access, you can use Singularity. A `transientxplorer.sif` file is included in the cloned repository.
-There is example candidate file and images in ``` ./candidates ```. Run the script through singularity as follows:
+### 📥 Step 1: Download the `.sif` file
+
+Download the latest `.sif` from Zenodo:
+
+[Download TransientXplorer.sif from Zenodo](https://zenodo.org/records/15974012/files/transientxplorer.sif?download=1)  
+DOI: [10.5281/zenodo.XXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXX)
+
+
+
+###  Step 2: Run the app
+
+Make sure you have your candidate data (e.g., CSV and images) in a folder like `./candidates`, then run:
+
 ```bash
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py
 ```
 
-Make sure to replace `./candidates` with the actual path to your data directory. The application will serve on **http://localhost:8050**
-
----
 
 ## Web Interface Overview
 ![Web_Interface](examples/web_interface.png)
