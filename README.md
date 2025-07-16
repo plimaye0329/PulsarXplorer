@@ -20,11 +20,11 @@ A lightweight Dash web application for exploring transient candidates interactiv
 git clone https://gitlab.mpcdf.mpg.de/pral/TransientXplorer.git
 cd TransientXplorer
 ```
-## 🛰 Run with Singularity (No Docker or root access needed)
+##  Run with Singularity (No Docker or root access needed)
 
 You can run the app using a pre-built Singularity image.
 
-### 📥 Step 1: Download the `.sif` file
+### Step 1: Download the `.sif` file
 
 Download the latest `.sif` from Zenodo:
 
