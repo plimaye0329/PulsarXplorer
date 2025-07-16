@@ -4,7 +4,7 @@ A lightweight Dash web application for exploring transient candidates interactiv
 
 ---
 
-## 🚀 Features
+##  Features
 
 - Interactive visualization of burst candidates  
 - Filter and explore events by band, time, or other parameters  
@@ -36,7 +36,7 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
 ## Web Interface Overview
 ![Web_Interface](examples/web_interface.png)
 
-## 🧭 Panel Breakdown
+##  Panel Breakdown
 
 ###  Left Panel (Controls)
 
@@ -61,10 +61,10 @@ Make sure to replace `/home/candidates` with the actual path to your data direct
         - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
     - User can click on any tabular cell to open the associated candidate image
 
-## 📬 Contact
+##  Contact
 
 For questions, bugs, or feature requests, open an issue or contact:  
-📧 limaye@mpifr-bonn.mpg.de
+limaye@mpifr-bonn.mpg.de
 
 
 
