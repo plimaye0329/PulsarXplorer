@@ -232,6 +232,8 @@ def register_callbacks(app):
             return None, 0
 
         return no_update, no_update
+    
+    
 
     @app.callback(
         Output('image-modal', 'is_open'),

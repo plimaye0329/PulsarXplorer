@@ -2,5 +2,6 @@ dash==2.16.1
 pandas==2.2.2
 plotly==5.21.0
 numpy==2.2.5
+dash-split-pane==1.0.0
 dash-bootstrap-components
 
