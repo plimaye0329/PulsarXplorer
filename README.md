@@ -29,8 +29,8 @@ You can run the app using a pre-built Singularity image.
 Download the latest `.sif` from Zenodo:
 
 [Download TransientXplorer.sif from Zenodo](https://zenodo.org/records/15974012/files/transientxplorer.sif?download=1)  
-DOI: [10.5281/zenodo.XXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXX)
 
+DOI: [10.5281/zenodo.15974012](https://doi.org/10.5281/zenodo.15974012)
 
 
 ###  Step 2: Run the app
@@ -73,6 +73,20 @@ singularity exec --bind ./candidates:/data transientxplorer.sif python3 Transien
 - The margin between graph and table can be dragged to resize the layout according to your needs.
 - The scatter plot can be filtered by applying filters on different burst properties
     - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
+
+## Citation:
+If you use TransientXplorer in your work, please cite the Zenodo DOI:
+```
+@misc{transientxplorer_zenodo,
+  author       = {Your Name(s)},
+  title        = {TransientXplorer: A lightweight Dash app for transient candidate exploration},
+  year         = {2025},
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.XXXXXXX},
+  url          = {https://doi.org/10.5281/zenodo.XXXXXXX}
+}
+```
+
 ##  Contact
 
 For questions, bugs, or feature requests, open an issue or contact:  
