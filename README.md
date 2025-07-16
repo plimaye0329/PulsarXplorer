@@ -49,7 +49,7 @@ Make sure to replace `./candidates` with the actual path to your data directory.
 
 - **Scatter Plot**: (Default)
     - **X-axis**: MJD
-    - **Y-axis**: Dispersion Measure (pc cm^{-3})
+    - **Y-axis**: Dispersion Measure (pc $cm^{-3}$)
     - **Color**: Width (ms)
     - **Size**: S/N (Signal-to-Noise Ratio)
 - Click any point to open the associated candidate image
