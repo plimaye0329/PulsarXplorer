@@ -7,7 +7,7 @@ A lightweight Dash web application for exploring transient candidates interactiv
 ##  Features
 
 - Interactive visualization of burst candidates  
-- Filter and explore events by band, time, or other parameters  
+- Filter and explore events by temporal widths, arrival times, or other parameters  
 - Responsive web UI powered by Plotly Dash  
 - Dockerized for easy deployment and portability  
 
