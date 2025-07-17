@@ -28,7 +28,7 @@ You can run the app using a pre-built Singularity image.
 
 Download the latest `.sif` from Zenodo:
 
-<<<<<<< HEAD
+
 [Download TransientXplorer.sif from Zenodo](https://zenodo.org/records/15974012/files/transientxplorer.sif?download=1)  
 
 DOI: [10.5281/zenodo.15974011](https://doi.org/10.5281/zenodo.15974011)
@@ -43,7 +43,6 @@ singularity exec --bind ./candidates:/data transientxplorer.sif python3 Transien
 ```
 
 
-=======
 [Download transientXplorer.sif from Zenodo](https://zenodo.org/records/15974012/files/transientxplorer.sif?download=1)  
 
 To Download it from the terminal:
