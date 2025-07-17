@@ -43,7 +43,7 @@ wget -O transientxplorer.sif "https://zenodo.org/records/15974012/files/transien
 
 
 ###  Example Usage
-The repository has a ```/candidates``` folder where you can find example csv file and image data. To visualise this data run:
+The repository has a ```/candidates``` folder where you can find example csv file and image data. To visualise this data, run:
 
 ```bash
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py 
