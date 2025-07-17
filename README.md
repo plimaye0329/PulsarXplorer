@@ -70,7 +70,7 @@ To check which ports are already in use on your device, run:
 netstat -tuln
 ```
 
->>>>>>> 88efef2ba360be977deac2babd678e2968009434
+
 ## Web Interface Overview
 ![Web_Interface](examples/web_interface.png)
 
@@ -103,13 +103,10 @@ netstat -tuln
 - The scatter plot can be filtered by applying filters on different burst properties
     - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
 
-<<<<<<< HEAD
-=======
 
 
 
 
->>>>>>> 88efef2ba360be977deac2babd678e2968009434
 ## Citation:
 If you use TransientXplorer in your work, please cite the Zenodo DOI:
 ```
