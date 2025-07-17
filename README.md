@@ -54,14 +54,6 @@ singularity exec --bind ./candidates:/data transientxplorer.sif python3 Transien
 ```
 For personal use, one only needs to change the path ```./candidates``` to the user defined path. Note that the csv file and image data should be located in the same path.
 
-## Troubleshooting:
-By default, the app runs on ```port 8050``` which might be already in use on certain servers. 
-
-To check which ports are already in use on your device, run:
-```
-netstat -tuln
-```
-Then, select a free port accordingly using the port flag.
 
 
 ## Web Interface Overview
@@ -112,6 +104,16 @@ If you use TransientXplorer in your work, please cite the Zenodo DOI:
   url          = {https://doi.org/10.5281/zenodo.15974011}
 }
 ```
+
+## Troubleshooting:
+By default, the app runs on ```port 8050``` which might be already in use on certain servers. 
+
+To check which ports are already in use on your device, run:
+```
+netstat -tuln
+```
+Then, select a free port accordingly using the port flag.
+
 
 ##  Contact
 
