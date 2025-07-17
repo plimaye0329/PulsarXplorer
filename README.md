@@ -27,7 +27,7 @@ cd TransientXplorer
 
 You can run the app using a pre-built Singularity image.
 
-### Step 1: Download the `.sif` file
+### Download the `.sif` file
 
 Download the latest `.sif` from Zenodo:
 
@@ -42,9 +42,8 @@ wget -O transientxplorer.sif "https://zenodo.org/records/15974012/files/transien
 ```
 
 
-###  Step 2: Run the app
-
-Make sure you have your candidate data (e.g., CSV and images) in a folder like `./candidates`, then run:
+###  Example Usage
+The repository has a ```/candidates``` folder where you can find example csv file and image data. To visualise this data run:
 
 ```bash
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py 
@@ -54,16 +53,8 @@ This will by default run the application on ```localhost:8050```. If you want to
 ```bash
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py --port <port number>
 ```
+For personal use, one only needs to change the path ```./candidates``` to the user defined path. Note that the csv file and image data should be located in the same path.
 
-
-
-###  Step 2: Run the app
-
-Make sure you have your candidate data (e.g., CSV and images) in a folder like `./candidates`, then run:
-
-```bash
-singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py
-```
 ## Troubleshooting:
 By default, the app runs on ```port 8050``` which might be already in use on certain servers. 
 
