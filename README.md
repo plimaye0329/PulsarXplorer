@@ -27,9 +27,8 @@ cd TransientXplorer
 
 You can run the app using a pre-built Singularity image.
 
-### Download the `.sif` file
 
-Download the latest `.sif` from Zenodo:
+### Download the latest `.sif` from Zenodo:
 
 
 [Download TransientXplorer.sif from Zenodo](https://zenodo.org/records/15974012/files/transientxplorer.sif?download=1)  
