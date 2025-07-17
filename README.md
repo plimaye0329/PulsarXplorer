@@ -47,7 +47,7 @@ Make sure you have your candidate data (e.g., CSV and images) in a folder like `
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py
 ```
 ## Known Bugs:
-By default, the app runs on port 8050 which might be already in use on certain servers. If this is the case, change the port number in the ```TransientXplorer.py``` script. 
+By default, the app runs on ```port 8050``` which might be already in use on certain servers. If this is the case, change the port number in the ```TransientXplorer.py``` script. 
 
 To check which ports are already in use on your device, run:
 ```
