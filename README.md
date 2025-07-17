@@ -47,7 +47,7 @@ The repository has a ```/candidates``` folder where you can find example csv fil
 ```bash
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py 
 ```
-This will by default run the application on ```localhost:8050```. If you want to specify a user defined port run:
+This will by default run the application on ```localhost:8050```. If you want to specify a user defined port, run:
 
 ```bash
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py --port <port number>
