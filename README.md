@@ -2,7 +2,7 @@
 
 **TransientXplorer** is a lightweight and interactive Dash-based web application for visualizing and inspecting transient candidates. Designed with time-domain astrophysics in mind, it allows researchers to efficiently explore candidate events using associated image data and metadata.
 
-It is especially useful for analyzing radio burst candidates produced by automated pipelines like TransientX ([Men and Barr 2024](https://arxiv.org/abs/2401.13834)).
+The application is built for analyzing radio burst candidates produced by TransientX (see [Men and Barr 2024](https://arxiv.org/abs/2401.13834)).
 
 
 ---
