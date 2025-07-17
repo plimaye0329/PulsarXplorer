@@ -1,8 +1,15 @@
+import argparse
 from dash import Dash, Output, Input
 from layout import create_layout
-from callbacks import register_all_callbacks  # no df here anymore
+from callbacks import register_all_callbacks
 import dash_bootstrap_components as dbc
 
+# --- Argument parser for selecting the port ---
+parser = argparse.ArgumentParser(description='Run the TransientXplorer Dash app.')
+parser.add_argument('--port', type=int, default=8050, help='Port number to run the server on')
+args = parser.parse_args()
+
+# --- Dash App Setup ---
 app = Dash(external_stylesheets=[dbc.themes.FLATLY], suppress_callback_exceptions=True)    
 app.layout = create_layout()
 
@@ -21,10 +28,12 @@ app.clientside_callback(
     prevent_initial_call=True
 )
 
-# Register callbacks WITHOUT passing a preloaded dataframe
+# Register callbacks without preloaded DataFrame
 register_all_callbacks(app)
 
+# --- Run the app on specified port ---
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=8050)
+    app.run_server(debug=True, host='0.0.0.0', port=args.port)
+
 
 
