@@ -1,4 +1,4 @@
-# 🌌 TransientXplorer
+# TransientXplorer
 
 **TransientXplorer** is a lightweight and interactive Dash-based web application for visualizing and inspecting transient candidates. Designed with time-domain astrophysics in mind, it allows researchers to efficiently explore candidate events using associated image data and metadata.
 
