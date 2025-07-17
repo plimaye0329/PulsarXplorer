@@ -46,7 +46,13 @@ Make sure you have your candidate data (e.g., CSV and images) in a folder like `
 ```bash
 singularity exec --bind ./candidates:/data transientxplorer.sif python3 TransientXplorer.py
 ```
+## Known Bugs:
+By default, the app runs on port 8050 which might be already in use on certain servers. If this is the case, change the port number in the ```TransientXplorer.py``` script. 
 
+To check which ports are already in use on your device, run:
+```
+netstat -tuln
+```
 
 ## Web Interface Overview
 ![Web_Interface](examples/web_interface.png)
@@ -79,6 +85,10 @@ singularity exec --bind ./candidates:/data transientxplorer.sif python3 Transien
 - The margin between graph and table can be dragged to resize the layout according to your needs.
 - The scatter plot can be filtered by applying filters on different burst properties
     - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
+
+
+
+
 
 ## Citation:
 If you use TransientXplorer in your work, please cite the Zenodo DOI:
