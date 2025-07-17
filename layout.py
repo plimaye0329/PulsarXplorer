@@ -17,7 +17,7 @@ def create_layout():
         dcc.Store(id='clear-clickdata', data=False),
         dcc.Store(id='cached-csv-data'),
         dcc.Store(id='last-modified-timestamp', data=""),
-        html.Button(id='close-popup', style={'display': 'none'}),
+        html.Button(id='close-popup-hidden', style={'display': 'none'}),
 
         dcc.Interval(id='interval-component', interval=5000, n_intervals=0),
         dcc.Interval(id='refresh-files-interval', interval=10000, n_intervals=0),
