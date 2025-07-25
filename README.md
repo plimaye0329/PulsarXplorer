@@ -96,7 +96,7 @@ For personal use, one only needs to change the path ```./candidates``` to the us
 If you use TransientXplorer in your work, please cite the Zenodo DOI:
 ```
 @misc{transientxplorer_zenodo,
-  author       = {Your Name(s)},
+  author       = {Pranav Limaye},
   title        = {TransientXplorer: A lightweight Dash app for transient candidate exploration},
   year         = {2025},
   publisher    = {Zenodo},
