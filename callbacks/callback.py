@@ -24,6 +24,8 @@ def load_csv_to_df(filename: str) -> pd.DataFrame:
     df_new = pd.read_csv(csv_path, delim_whitespace=True, header=None)
     df_new.columns = ['col1', 'col2', 'MJD', 'Burst_DM', 'width', 'S/N',
                       'col7', 'col8', 'ImagePath', 'col10', 'col11']
+
+
     df_new['ImageFilename'] = df_new['ImagePath'].apply(lambda x: os.path.basename(x))
     return df_new
 
@@ -91,7 +93,7 @@ def register_callbacks(app):
         y_val = 'Burst_DM' if 'Burst_DM' in numeric_cols else (numeric_cols[1] if len(numeric_cols) > 1 else x_val)
 
         table_data = df_new[visible_cols].to_dict('records')
-        table_columns = [{"name": col, "id": col} for col in visible_cols]
+        table_columns = [{"name": col, "id": col, "type": "numeric" if col in numeric_cols else "text"} for col in visible_cols]
 
         if triggered_id == 'csv-selector':
             alert_msg = f"Successfully loaded {selected_csv}"
