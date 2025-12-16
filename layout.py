@@ -12,22 +12,27 @@ def get_csv_files():
 
 def create_layout():
     return html.Div([
+        # ---- Stores ----
         dcc.Store(id='clicked-point'),
         dcc.Store(id='click-counter', data=0),
         dcc.Store(id='clear-clickdata', data=False),
         dcc.Store(id='cached-csv-data'),
         dcc.Store(id='last-modified-timestamp', data=""),
+        dcc.Store(id='ml-label-store', data={}),   # 🔑 NEW
         html.Button(id='close-popup-hidden', style={'display': 'none'}),
 
+        # ---- Intervals ----
         dcc.Interval(id='interval-component', interval=5000, n_intervals=0),
         dcc.Interval(id='refresh-files-interval', interval=10000, n_intervals=0),
 
         dbc.Container([
             dbc.Row([
-                # Sidebar
+                # ===================== Sidebar =====================
                 dbc.Col([
                     dbc.Card([
-                        dbc.CardHeader(html.H4("Selection Panel", className="mb-0", style={"color": "black"})),
+                        dbc.CardHeader(
+                            html.H4("Selection Panel", className="mb-0", style={"color": "black"})
+                        ),
                         dbc.CardBody([
                             dbc.Alert(
                                 id='file-load-alert',
@@ -35,9 +40,14 @@ def create_layout():
                                 duration=4000,
                                 dismissable=True
                             ),
-                            html.H2("TransientXplorer", className="display-5 mb-3", style={"color": "black"}),
-                            html.P("Interactive tool for exploring transient burst data.",
-                                   className="text-muted fst-italic"),
+
+                            html.H2("TransientXplorer", className="display-5 mb-3",
+                                    style={"color": "black"}),
+
+                            html.P(
+                                "Interactive tool for exploring transient burst data.",
+                                className="text-muted fst-italic"
+                            ),
 
                             dbc.Checklist(
                                 id='auto-refresh-toggle',
@@ -57,14 +67,15 @@ def create_layout():
                                 style={"marginBottom": "15px", "width": "100%"}
                             ),
 
-                            dbc.Label("Select CSV file", className="mt-3 fw-semibold", style={"color": "black"}),
+                            dbc.Label("Select CSV file", className="mt-3 fw-semibold",
+                                      style={"color": "black"}),
                             dcc.Dropdown(
                                 id='csv-selector',
                                 options=[],
                                 placeholder='Choose a CSV file',
-                                style={"color": "black"},
                                 className="mb-3"
                             ),
+
                             html.Hr(),
 
                             html.Label("X-axis:", style={"color": "black"}),
@@ -72,7 +83,6 @@ def create_layout():
                                 id='x-axis',
                                 options=[],
                                 placeholder='Select X-axis column',
-                                style={"color": "black"},
                                 persistence=True
                             ),
 
@@ -81,8 +91,7 @@ def create_layout():
                                 id='x-scale',
                                 options=[{'label': s, 'value': s} for s in ['linear', 'log']],
                                 value='linear',
-                                inline=True,
-                                style={"color": "black"}
+                                inline=True
                             ),
 
                             html.Label("Y-axis:", style={"color": "black"}),
@@ -90,7 +99,6 @@ def create_layout():
                                 id='y-axis',
                                 options=[],
                                 placeholder='Select Y-axis column',
-                                style={"color": "black"},
                                 persistence=True
                             ),
 
@@ -99,26 +107,24 @@ def create_layout():
                                 id='y-scale',
                                 options=[{'label': s, 'value': s} for s in ['linear', 'log']],
                                 value='linear',
-                                inline=True,
-                                style={"color": "black"}
+                                inline=True
                             ),
 
                             html.Hr(),
-                            
                         ])
                     ], color="light", className="shadow-sm", style={
                         "borderRadius": "12px",
-                        "background": "black",
-                        "color": "black",
                         "padding": "15px",
                         "height": "100%"
                     }),
                 ], width=3, style={"height": "100vh"}),
 
-                # Main content area with split pane
+                # ===================== Main Panel =====================
                 dbc.Col([
                     dbc.Card([
-                        dbc.CardHeader(html.H4("Monitoring Interface", className="mb-0")),
+                        dbc.CardHeader(
+                            html.H4("Monitoring Interface", className="mb-0")
+                        ),
                         dbc.CardBody([
                             DashSplitPane(
                                 split="horizontal",
@@ -126,10 +132,10 @@ def create_layout():
                                 minSize=100,
                                 allowResize=True,
                                 children=[
-                                    dcc.Graph(id="scatter-plot", style={
-                                        "width": "100%",
-                                        "height": "100%"
-                                    }),
+                                    dcc.Graph(
+                                        id="scatter-plot",
+                                        style={"width": "100%", "height": "100%"}
+                                    ),
                                     html.Div(
                                         dash_table.DataTable(
                                             id='main-table',
@@ -140,7 +146,10 @@ def create_layout():
                                             sort_action='native',
                                             row_selectable='single',
                                             selected_rows=[],
-                                            style_table={'overflowX': 'auto', 'height': '100%'},
+                                            style_table={
+                                                'overflowX': 'auto',
+                                                'height': '100%'
+                                            },
                                             style_cell={'textAlign': 'left'},
                                         ),
                                         id='table-container',
@@ -150,20 +159,67 @@ def create_layout():
                                 style={"height": "80vh"}
                             ),
 
+                            # ===================== Modal =====================
                             dbc.Modal(
                                 [
                                     dbc.ModalHeader(
-                                        dbc.Button('✖', id='close-popup', n_clicks=0, color='link',
-                                                   style={'fontSize': '20px', 'float': 'right'}),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    dbc.Button(
+                                                        "RFI",
+                                                        id="label-rfi",
+                                                        color="danger",
+                                                        size="sm"
+                                                    ),
+                                                    width="auto"
+                                                ),
+                                                dbc.Col(
+                                                    dbc.Button(
+                                                        "Pulse",
+                                                        id="label-pulse",
+                                                        color="success",
+                                                        size="sm"
+                                                    ),
+                                                    width="auto"
+                                                ),
+                                                dbc.Col(
+                                                    dbc.Button(
+                                                        "✖",
+                                                        id="close-popup",
+                                                        n_clicks=0,
+                                                        color="link",
+                                                        style={"fontSize": "18px"}
+                                                    ),
+                                                    width="auto"
+                                                ),
+                                            ],
+                                            justify="end",
+                                            align="center",
+                                            className="g-2"
+                                        ),
                                         close_button=False
                                     ),
+
                                     dbc.ModalBody([
-                                        html.Img(id='popup-image', style={
-                                            "width": "100%", "height": "auto", "border": "2px solid #ccc",
-                                            "display": "block", "margin": "0 auto"
-                                        }),
-                                        html.P(id='popup-mjd', style={"fontSize": "12px", "marginTop": "10px"}),
-                                        html.P(id='popup-dm', style={"fontSize": "12px"}),
+                                        html.Img(
+                                            id='popup-image',
+                                            style={
+                                                "width": "100%",
+                                                "height": "auto",
+                                                "border": "2px solid #ccc",
+                                                "display": "block",
+                                                "margin": "0 auto"
+                                            }
+                                        ),
+                                        html.P(
+                                            id='popup-mjd',
+                                            style={"fontSize": "12px", "marginTop": "10px"}
+                                        ),
+                                        html.P(
+                                            id='popup-dm',
+                                            style={"fontSize": "12px"}
+                                        ),
                                     ])
                                 ],
                                 id='image-modal',
@@ -175,8 +231,13 @@ def create_layout():
 
                             html.Div(id='dynamic-content', style={"marginTop": "20px"})
                         ], style={"height": "100%", "overflowY": "auto"})
-                    ], className="shadow-sm", style={"borderRadius": "12px", "height": "100%"})
+                    ], className="shadow-sm", style={
+                        "borderRadius": "12px",
+                        "height": "100%"
+                    })
                 ], width=9, style={"height": "100vh"}),
+
             ], className="gx-4 bg-dark", style={"height": "100%"})
         ], fluid=True, className="p-0 m-0", style={"height": "100%"}),
     ], style={"height": "100vh", "margin": 0, "padding": 0})
+

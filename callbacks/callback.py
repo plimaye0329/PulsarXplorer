@@ -29,6 +29,33 @@ def load_csv_to_df(filename: str) -> pd.DataFrame:
     df_new['ImageFilename'] = df_new['ImagePath'].apply(lambda x: os.path.basename(x))
     return df_new
 
+def write_labeled_cands(original_file, label_store):
+    input_path = os.path.join(image_directory, original_file)
+
+    df = load_csv_to_df(original_file)
+
+    # Initialize column
+    df['ML Labels'] = np.nan
+
+    for idx, row in df.iterrows():
+        key = f"{row['ImageFilename']}|{row['MJD']}|{row['Burst_DM']}"
+        if key in label_store:
+            df.at[idx, 'ML Labels'] = label_store[key]
+
+    output_file = original_file.replace(
+        '.cands', '_labeled.cands'
+    )
+    output_path = os.path.join(image_directory, output_file)
+
+    df.to_csv(
+        output_path,
+        sep=' ',
+        header=False,
+        index=False,
+        na_rep='NaN'
+    )
+
+
 def register_callbacks(app):
     @app.callback(
         Output('csv-selector', 'options'),
@@ -236,6 +263,40 @@ def register_callbacks(app):
         return no_update, no_update
     
     
+    @app.callback(
+        Output('ml-label-store', 'data'),
+        Output('label-rfi', 'color'),
+        Output('label-rfi', 'outline'),
+        Output('label-pulse', 'color'),
+        Output('label-pulse', 'outline'),
+        Input('label-rfi', 'n_clicks'),
+        Input('label-pulse', 'n_clicks'),
+        State('clicked-point', 'data'),
+        State('ml-label-store', 'data'),
+        prevent_initial_call=True
+    )
+    def update_ml_labels(rfi_clicks, pulse_clicks, point_data, label_store):
+        if not point_data or 'customdata' not in point_data:
+            raise PreventUpdate
+
+        image, mjd, dm = point_data['customdata']
+        key = f"{image}|{mjd}|{dm}"
+
+        label_store = label_store or {}
+
+        ctx = callback_context
+        trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+
+        if trigger == 'label-rfi':
+            label_store[key] = 0
+        elif trigger == 'label-pulse':
+            label_store[key] = 1
+
+        rfi_color, rfi_outline = ('danger', False) if label_store.get(key) == 0 else ('danger', True)
+        pulse_color, pulse_outline = ('success', False) if label_store.get(key) == 1 else ('success', True)
+
+        return label_store, rfi_color, rfi_outline, pulse_color, pulse_outline
+
 
     @app.callback(
         Output('image-modal', 'is_open'),
@@ -246,8 +307,10 @@ def register_callbacks(app):
         Input('click-counter', 'data'),
         Input('close-popup', 'n_clicks'),
         State('image-modal', 'is_open'),
+        State('ml-label-store', 'data'),
+        State('csv-selector', 'value'),
     )
-    def toggle_modal(point_data, click_counter, close_clicks, is_open):
+    def toggle_modal(point_data, click_counter, close_clicks, is_open, label_store, selected_csv):
         ctx = callback_context
         if not ctx.triggered:
             return False, None, "", ""
@@ -256,6 +319,9 @@ def register_callbacks(app):
 
         # Close modal on close button click
         if trigger == 'close-popup':
+            if label_store and selected_csv.endswith('.cands'):
+                write_labeled_cands(selected_csv, label_store)
+
             return False, None, "", ""
 
         # Show modal on scatter-plot or table click
@@ -272,5 +338,8 @@ def register_callbacks(app):
             return True, src, mjd_text, dm_text
 
         return is_open, no_update, no_update, no_update
+
+
+
 
 
