@@ -89,11 +89,24 @@ For personal use, one only needs to change the path ```./candidates``` to the us
     - For example: Only visualize high S/N ratio candidates using a (> 30) filter in the S/N column
 
 
-## ML Classification:
-After opening the associated candidate image, the pop-up will look like this:
-![Image_pop-up](examples/pop_up.png)
+## ML Classification
 
-On the top left corner of the image, you will find an option to label the candidate as 'rfi' or 'pulse'. Once you label all the candidates using manual inspection, a new .cands file will be written with an extra column for the ML Label (0: rfi and 1: pulse) respectively.
+After opening the associated candidate image, a pop-up window appears as shown below:
+
+![Candidate pop-up](examples/pop_up.png)
+
+In the **top-left corner** of the pop-up, you can label the candidate as either:
+
+- **RFI** → `0`
+- **Pulse** → `1`
+
+After manually inspecting and labeling the candidates, the application automatically writes a new `.cands` file containing an additional column named **`ML Labels`**, where:
+
+- `0` corresponds to **RFI**
+- `1` corresponds to a **Pulse**
+- Unclassified candidates are assigned **`NaN`**
+
+
 
 ## Citation:
 If you use TransientXplorer in your work, please cite the Zenodo DOI:
