@@ -24,37 +24,20 @@ def load_csv_to_df(filename: str) -> pd.DataFrame:
     df_new = pd.read_csv(csv_path, delim_whitespace=True, header=None)
     df_new.columns = ['col1', 'col2', 'MJD', 'Burst_DM', 'width', 'S/N',
                       'col7', 'col8', 'ImagePath', 'col10', 'col11']
-
-
     df_new['ImageFilename'] = df_new['ImagePath'].apply(lambda x: os.path.basename(x))
     return df_new
 
 def write_labeled_cands(original_file, label_store):
     input_path = os.path.join(image_directory, original_file)
-
     df = load_csv_to_df(original_file)
-
-    # Initialize column
     df['ML Labels'] = np.nan
-
     for idx, row in df.iterrows():
         key = f"{row['ImageFilename']}|{row['MJD']}|{row['Burst_DM']}"
         if key in label_store:
             df.at[idx, 'ML Labels'] = label_store[key]
-
-    output_file = original_file.replace(
-        '.cands', '_labeled.cands'
-    )
+    output_file = original_file.replace('.cands', '_labeled.cands')
     output_path = os.path.join(image_directory, output_file)
-
-    df.to_csv(
-        output_path,
-        sep=' ',
-        header=False,
-        index=False,
-        na_rep='NaN'
-    )
-
+    df.to_csv(output_path, sep=' ', header=False, index=False, na_rep='NaN')
 
 def register_callbacks(app):
     @app.callback(
@@ -88,7 +71,7 @@ def register_callbacks(app):
         if not selected_csv:
             return (
                 html.Div("Please select a CSV."), [], [], 5000, "",
-                [], [], None, None, "","", False
+                [], [], None, None, "", "", False
             )
 
         try:
@@ -153,27 +136,41 @@ def register_callbacks(app):
         Input("x-scale", "value"),
         Input("y-scale", "value"),
         Input('main-table', 'derived_virtual_data'),
-        State('main-table', 'data'),
+        Input('ml-label-store', 'data'),  # <- make Input
+        State('main-table', 'data')
     )
-    def update_figure(x_col, y_col, x_scale, y_scale, table_data_virtual, table_data_fallback):
+    def update_figure(x_col, y_col, x_scale, y_scale, table_data_virtual, label_store, table_data_fallback):
         table_data = table_data_virtual if table_data_virtual is not None else table_data_fallback
+        label_store = label_store or {}
 
         if not table_data:
             return px.scatter(title="No data to plot.")
 
         df = pd.DataFrame(table_data)
-
         if x_col not in df or y_col not in df or 'S/N' not in df:
             return px.scatter(title="Invalid or missing columns.")
-    
-        axis_label_map = {
-            'MJD': 'MJD',
-            'Burst_DM': 'DM (pc cm⁻³)',
-            'width': 'Width (ms)',
-            'S/N': 'S/N Ratio',
-        }
 
-    # Create subplots: main plot and vertical histogram
+        # Marker size by S/N
+        sn = df['S/N']
+        sn_scaled = 10 + 15 * (sn - sn.min()) / (sn.max() - sn.min() + 1e-9)
+
+        # Marker color and symbol by label
+        colors, symbols = [], []
+        for _, row in df.iterrows():
+            key = f"{row['ImageFilename']}|{row['MJD']}|{row['Burst_DM']}"
+            label = label_store.get(key, np.nan)
+            if label == 0:
+                colors.append('red')
+                symbols.append('x')
+            elif label == 1:
+                colors.append('green')
+                symbols.append('circle')
+            else:
+                colors.append('blue')
+                symbols.append('circle-open')
+
+        axis_label_map = {'MJD': 'MJD', 'Burst_DM': 'DM (pc cm⁻³)', 'width': 'Width (ms)', 'S/N': 'S/N Ratio'}
+
         fig = make_subplots(
             rows=1, cols=2,
             column_widths=[0.8, 0.2],
@@ -181,31 +178,26 @@ def register_callbacks(app):
             horizontal_spacing=0.02,
             specs=[[{"type": "scatter"}, {"type": "histogram"}]]
         )
-        sn = df['S/N']
-        sn_scaled = 10 + 15 * (sn - sn.min()) / (sn.max() - sn.min() + 1e-9)
 
-    # Main scatter plot
         fig.add_trace(
             go.Scatter(
                 x=df[x_col],
                 y=df[y_col],
                 mode='markers',
-                
                 marker=dict(
                     size=sn_scaled,
-                    color=df['width'],
-                    colorscale='Viridis',
-                    showscale=True,
-                    colorbar=dict(title="Width (ms)")
+                    color=colors,
+                    symbol=symbols,
+                    opacity=0.7,
+                    line=dict(width=1, color='black')
                 ),
-                customdata=df[[col for col in ['ImageFilename', 'MJD', 'Burst_DM'] if col in df]].values,
-                hovertemplate=None,
+                customdata=df[['ImageFilename', 'MJD', 'Burst_DM']].values,
+                hovertemplate="<b>%{customdata[0]}</b><br>MJD: %{customdata[1]}<br>DM: %{customdata[2]}<br>S/N: %{y}<extra></extra>",
                 showlegend=False,
             ),
             row=1, col=1
         )
 
-    # Histogram for Y-axis
         fig.add_trace(
             go.Histogram(
                 y=df[y_col],
@@ -222,7 +214,7 @@ def register_callbacks(app):
             xaxis_title=axis_label_map.get(x_col, x_col),
             yaxis_title=axis_label_map.get(y_col, y_col),
             hovermode="closest",
-            margin=dict(l=50, r=20, t=40, b=40),
+            margin=dict(l=50, r=20, t=40, b=40)
         )
 
         return fig
@@ -240,12 +232,10 @@ def register_callbacks(app):
         ctx = callback_context
         if not ctx.triggered:
             return no_update, no_update
-
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]
 
         if trigger == 'scatter-plot' and clickData:
             return clickData["points"][0], (click_counter or 0) + 1
-
         elif trigger == 'main-table' and active_cell:
             if not virtual_data or active_cell.get('row') is None:
                 return no_update, no_update
@@ -256,13 +246,10 @@ def register_callbacks(app):
             except Exception as e:
                 print(f"Error accessing row: {e}")
                 return no_update, no_update
-
         elif trigger == 'close-popup':
             return None, 0
-
         return no_update, no_update
-    
-    
+
     @app.callback(
         Output('ml-label-store', 'data'),
         Output('label-rfi', 'color'),
@@ -278,12 +265,9 @@ def register_callbacks(app):
     def update_ml_labels(rfi_clicks, pulse_clicks, point_data, label_store):
         if not point_data or 'customdata' not in point_data:
             raise PreventUpdate
-
         image, mjd, dm = point_data['customdata']
         key = f"{image}|{mjd}|{dm}"
-
         label_store = label_store or {}
-
         ctx = callback_context
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]
 
@@ -296,7 +280,6 @@ def register_callbacks(app):
         pulse_color, pulse_outline = ('success', False) if label_store.get(key) == 1 else ('success', True)
 
         return label_store, rfi_color, rfi_outline, pulse_color, pulse_outline
-
 
     @app.callback(
         Output('image-modal', 'is_open'),
@@ -314,32 +297,23 @@ def register_callbacks(app):
         ctx = callback_context
         if not ctx.triggered:
             return False, None, "", ""
-
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]
 
-        # Close modal on close button click
         if trigger == 'close-popup':
-            if label_store and selected_csv.endswith('.cands'):
+            if label_store and selected_csv and selected_csv.endswith('.cands'):
                 write_labeled_cands(selected_csv, label_store)
-
             return False, None, "", ""
 
-        # Show modal on scatter-plot or table click
         if trigger in ['clicked-point', 'click-counter'] and point_data and 'customdata' in point_data:
             image_filename, mjd, burst_dm = point_data["customdata"]
             image_path = os.path.join(image_directory, image_filename)
             encoded = encode_image(image_path)
             if not encoded:
                 return False, None, "", ""
-
             src = f"data:image/png;base64,{encoded}"
             mjd_text = f"MJD: {mjd}"
             dm_text = f"Burst DM: {burst_dm}"
             return True, src, mjd_text, dm_text
 
         return is_open, no_update, no_update, no_update
-
-
-
-
 
