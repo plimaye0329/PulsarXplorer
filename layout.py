@@ -43,7 +43,7 @@ def create_layout():
                                         className="h-100 shadow-sm",
                                         children=[
                                             dbc.CardHeader(
-                                                html.H5("Selection Panel", className="mb-0")
+                                                html.H5("PulsarXplorer", className="mb-0")
                                             ),
                                             dbc.CardBody(
                                                 [
@@ -85,13 +85,13 @@ def create_layout():
                                                     html.Hr(),
 
                                                     # -------------------------
-                                                    # CSV selector
+                                                    # .cands file selector
                                                     # -------------------------
-                                                    dbc.Label("Select CSV file"),
+                                                    dbc.Label("Select .cands file"),
                                                     dcc.Dropdown(
                                                         id='csv-selector',
                                                         options=[],
-                                                        placeholder='Choose a CSV file'
+                                                        placeholder='Choose a .cands file'
                                                     ),
 
                                                     html.Hr(),
@@ -152,7 +152,7 @@ def create_layout():
                                         className="h-100 shadow-sm",
                                         children=[
                                             dbc.CardHeader(
-                                                html.H5("Monitoring Interface", className="mb-0")
+                                                html.H5("Pulsar Candidate Monitoring", className="mb-0")
                                             ),
                                             dbc.CardBody(
                                                 style={"padding": "0"},
@@ -181,7 +181,8 @@ def create_layout():
                                                                 row_selectable='single',
                                                                 style_table={
                                                                     'height': '100%',
-                                                                    'overflowY': 'auto'
+                                                                    'overflowY': 'auto',
+                                                                    'overflowX': 'auto'
                                                                 },
                                                                 style_cell={
                                                                     'textAlign': 'left'
@@ -231,7 +232,7 @@ def create_layout():
                                                                         }
                                                                     ),
                                                                     html.P(
-                                                                        id='popup-mjd',
+                                                                        id='popup-id',
                                                                         style={
                                                                             "fontSize": "12px",
                                                                             "marginTop": "10px"
@@ -239,6 +240,10 @@ def create_layout():
                                                                     ),
                                                                     html.P(
                                                                         id='popup-dm',
+                                                                        style={"fontSize": "12px"}
+                                                                    ),
+                                                                    html.P(
+                                                                        id='popup-sn',
                                                                         style={"fontSize": "12px"}
                                                                     ),
                                                                 ]
@@ -268,4 +273,3 @@ def create_layout():
         ],
         style={"height": "100vh"},
     )
-
